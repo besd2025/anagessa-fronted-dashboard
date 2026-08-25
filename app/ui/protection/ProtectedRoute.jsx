@@ -34,7 +34,7 @@ export default function ProtectedRoute({ children, allowedRoles }) {
     useEffect(() => {
         const verifyAuth = () => {
             // Lecture du localStorage uniquement côté client (dans le useEffect)
-            const accessToken = localStorage.getItem("Access_Token");
+            const accessToken = localStorage.getItem("accessToken");
 
             if (!accessToken) {
                 setIsAuthorized(false);

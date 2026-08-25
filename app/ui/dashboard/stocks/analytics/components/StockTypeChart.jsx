@@ -47,7 +47,7 @@ const chartConfig = {
 };
 
 export function StockTypeChart() {
-  const [data, setData] = React.useState({});
+  const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     const getDatas = async () => {
@@ -62,7 +62,7 @@ export function StockTypeChart() {
           }
         );
 
-        const chatData = response?.map((item) => ({
+        const chatData = (Array.isArray(response) ? response : []).map((item) => ({
           grade: item?.grade__grade_name,
           amount: item?.total_grains,
           fill:

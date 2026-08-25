@@ -25,7 +25,7 @@ export function LoginForm({ className, ...props }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   useEffect(() => {
-    const accessToken = localStorage.getItem("Access_Token");
+    const accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
       const user = DecodeToJwt(accessToken);
       const now = new Date();
@@ -38,7 +38,7 @@ export function LoginForm({ className, ...props }) {
           router.push("/anagessa-dashboard/home");
         }
       } else {
-        localStorage.removeItem("Access_Token");
+        localStorage.removeItem("accessToken");
         router.push("/");
       }
     } else {
@@ -155,7 +155,7 @@ export function LoginForm({ className, ...props }) {
               </Field>
               <Field>
                 <div className="relative">
-                  <div className="flex items-center">
+                  <div className="flex items-center mb-2">
                     <FieldLabel htmlFor="password">Password</FieldLabel>
                     <a
                       href="#"

@@ -4,7 +4,7 @@ import { AppSidebar } from "@/app/ui/dashboard/app-sidebar";
 import { AppHeader } from "@/app/ui/dashboard/app-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
-import NextTopLoader from 'nextjs-toploader';
+import NextTopLoader from "nextjs-toploader";
 export default function Layout({ children }) {
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function Layout({ children }) {
     }
   }
   useEffect(() => {
-    const token = localStorage.getItem("Access_Token");
+    const token = localStorage.getItem("accessToken");
     const now = new Date();
     if (!token) {
       router.replace("/");

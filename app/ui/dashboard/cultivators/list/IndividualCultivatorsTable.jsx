@@ -94,46 +94,52 @@ export default function IndividualCultivatorsTable({
     const getCultivators = async () => {
       setLoading(true);
       try {
+        const params = {
+          limit: limit,
+          offset: pointer,
+          search: searchvalue,
+        };
+        // Appliquer les filtres géographiques et démographiques de anagessa_dashboard
+        if (filterData) {
+          if (filterData.province) params.province_name = filterData.province;
+          if (filterData.commune) params.commune_name = filterData.commune;
+          if (filterData.zone) params.zone_name = filterData.zone;
+          if (filterData.colline) params.colline_name = filterData.colline;
+          if (filterData.ageMin) params.age_min = filterData.ageMin;
+          if (filterData.ageMax) params.age_max = filterData.ageMax;
+          if (filterData.dateFrom) params.created_at_min = filterData.dateFrom;
+          if (filterData.dateTo) params.created_at_max = filterData.dateTo;
+        }
         const response = await fetchData(
           "get",
-          "cultivators/get_mais_cultivators/?cultivateur_type=personne",
-          {
-            params: {
-              limit: limit,
-              offset: pointer,
-              ...filterData,
-              search: searchvalue,
-            },
-          },
+          "/cultivators/",
+          { params },
         );
         const formattedData = response.results.map((cultivator) => ({
           id: cultivator.id,
           cultivator: {
             cultivator_code: cultivator?.cultivator_code,
-            first_name: cultivator?.cultivator_first_name,
-            last_name: cultivator?.cultivator_last_name,
-            image_url: cultivator?.cultivator_photo,
-            telephone: cultivator?.cultivator_telephone,
+            first_name: cultivator?.first_name,
+            last_name: cultivator?.last_name,
+            image_url: cultivator?.photo,
+            telephone: cultivator?.telephone,
           },
-          cni: cultivator?.cultivator_cni,
+          cni: cultivator?.cni,
           in_payment: cultivator?.in_payment,
-          cni_image_url: cultivator?.cultivator_cni_photo,
-          sdl_ct: cultivator?.ct_sdl_name,
-          society: cultivator?.societe_name,
+          cni_image_url: cultivator?.cni_photo,
+          hangar: cultivator?.hangar?.hangar_name || cultivator?.hangar_name,
           localite: {
-            province:
-              cultivator?.cultivator_adress?.zone_code?.commune_code
-                ?.province_code?.province_name,
-            commune:
-              cultivator?.cultivator_adress?.zone_code?.commune_code
-                ?.commune_name,
+            province: cultivator?.province,
+            commune: cultivator?.commune,
+            zone: cultivator?.zone,
+            colline: cultivator?.colline,
           },
-          champs: cultivator?.nombre_champs,
+          genre: cultivator?.genre,
+          age: cultivator?.age,
+          created_at: cultivator?.created_at,
         }));
 
-
         setData(formattedData);
-        console.log("formattedData", response);
         setTotalCount(response.count);
       } catch (error) {
         console.error("Error fetching individual cultivators:", error);
@@ -151,48 +157,45 @@ export default function IndividualCultivatorsTable({
   const exportCultivatorsToExcel = async () => {
     setLoadingEportBtn(true);
     try {
-      // Étape 1 : Récupérer le nombre total d'enregistrements
+      // Étape 1 : Lancer l'export asynchrone (logique identique à anagessa_dashboard)
       const initial_export = await fetchData(
         "post",
-        "/mais/achat_mais/export_achat_quantites/",
+        "/cultivators/export_excel/",
         {
           params: {},
           additionalHeaders: {},
-          body: { cultivateur_type: "personne", export_type: "RESUME" },
+          body: {},
         },
       );
-      if (initial_export.data?.status == "PENDING") {
-        const task_id = initial_export?.data?.report_id;
-        let isDone = false;
-        while (!isDone) {
+
+      if (initial_export.status == 202) {
+        setLoadingEportBtn(true);
+        const task_id = initial_export?.data?.task_id;
+        const intervalId = setInterval(async () => {
           const export_excel = await fetchData(
             "get",
-            "mais/achat_mais/export_achat_status/",
+            "/cultivators/check_task/",
             {
-              params: { report_id: task_id },
+              params: { task_id: task_id },
             },
           );
-          if (export_excel.status === "SUCCESS") {
-            console.log("export_excel", export_excel);
+
+          if (export_excel.status === "done") {
+            clearInterval(intervalId);
+            setLoadingEportBtn(false);
             setActivedownloadBtn(true);
-            setReportId(task_id);
-            isDone = true;
-          } else {
-            // Attendre 2 secondes avant la prochaine vérification
-            await new Promise((resolve) => setTimeout(resolve, 2000));
           }
-        }
+        }, 2000);
       }
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
     } finally {
-      setLoadingEportBtn(false);
+      // Le loading reste actif pendant le polling
     }
   };
   const DownloadCultivatorsToExcel = async () => {
     try {
-      const response = await fetchData("get", "/mais/achat_mais/download/", {
-        params: { report_id: reportId },
+      const response = await fetchData("get", "/cultivators/download_excel/", {
         isBlob: true,
       });
 

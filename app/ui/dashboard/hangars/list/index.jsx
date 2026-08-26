@@ -78,13 +78,23 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
     const getSdls = async () => {
       setLoading(true);
       try {
-        const response = await fetchData("get", "cafe/hangars/", {
-          params: {
-            limit: limit,
-            offset: pointer,
-            ...filterData,
-            search: search,
-          },
+        const params = {
+          limit: limit,
+          offset: pointer,
+          search: search,
+        };
+        // Appliquer les filtres depuis anagessa_dashboard/hangar_list.jsx
+        if (filterData && Object.keys(filterData).length > 0) {
+          if (filterData.province) params.province = filterData.province;
+          if (filterData.commune) params.commune = filterData.commune;
+          if (filterData.zone) params.zone = filterData.zone;
+          if (filterData.QtMinAchetee) params.min_quantity_achete = filterData.QtMinAchetee;
+          if (filterData.QtMaxAchete) params.max_quantity_achete = filterData.QtMaxAchete;
+          if (filterData.QtMinVendue) params.min_quantity_vendu = filterData.QtMinVendue;
+          if (filterData.QtMaxVendue) params.max_quantity_vendu = filterData.QtMaxVendue;
+        }
+        const response = await fetchData("get", "/hangars/", {
+          params,
           additionalHeaders: {},
           body: {},
         });
@@ -92,29 +102,28 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
         const sdlData = results.map((hangar) => ({
           id: hangar?.id,
           hangar: {
-            sdl_code: hangar?.sdl_code,
-            sdl_name: hangar?.sdl_nom,
-            type: "",
+            sdl_code: hangar?.hangar_code,
+            sdl_name: hangar?.hangar_name,
+            type: hangar?.type || "",
           },
-          society: hangar?.societe?.nom_societe || "",
           responsable: {
-            first_name: hangar?.sdl_responsable?.user?.first_name || "",
-            last_name: hangar?.sdl_responsable?.user?.last_name || "",
-            telephone: hangar?.sdl_responsable?.user?.phone || "",
+            first_name: hangar?.responsable_name?.split(" ")?.[0] || hangar?.responsable_name || "",
+            last_name: hangar?.responsable_name?.split(" ")?.[1] || "",
+            telephone: hangar?.responsable_phone || "",
           },
           localite: {
-            province:
-              hangar?.sdl_adress?.zone_code?.commune_code?.province_code
-                ?.province_name || "",
-            commune:
-              hangar?.sdl_adress?.zone_code?.commune_code?.commune_name || "",
+            province: hangar?.province || "",
+            commune: hangar?.commune || "",
+            zone: hangar?.zone || "",
           },
+          qte_achete: hangar?.qte_achete,
+          qte_vendu: hangar?.qte_vendu,
+          stock_actuel: hangar?.stock_actuel,
         }));
-        console.log(response);
         setData(sdlData);
         setTotalCount(response?.count);
       } catch (error) {
-        console.error("Error fetching cultivators data:", error);
+        console.error("Error fetching hangars data:", error);
       } finally {
         setLoading(false);
       }
@@ -155,128 +164,72 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
   const handleExportSDLs = async () => {
     setLoadingEportBtn(true);
     try {
-      const initResponse = await fetchData("get", `cafe/hangars/`, {
-        params: { limit: 1, for_washed: true },
+      // Export asynchrone identique à anagessa_dashboard/hangar_list.jsx
+      const initial_export = await fetchData("post", "/hangars/export_excel/", {
+        params: {},
+        additionalHeaders: {},
+        body: {},
       });
-      console.log(initResponse);
-      const total = initResponse?.count || 0;
-      if (total === 0) {
-        setLoadingEportBtn(false);
-        return;
+
+      if (initial_export.status == 202) {
+        setLoadingEportBtn(true);
+        const task_id = initial_export?.data?.task_id;
+        const intervalId = setInterval(async () => {
+          const export_excel = await fetchData("get", "/hangars/check_task/", {
+            params: { task_id: task_id },
+          });
+          if (export_excel.status === "done") {
+            clearInterval(intervalId);
+            setLoadingEportBtn(false);
+            setActivedownloadBtn(true);
+          }
+        }, 2000);
       }
-
-      const response = await fetchData("get", `cafe/hangars/`, {
-        params: { limit: total, for_washed: true },
-      });
-
-      const allData = response.results || [];
-      const formattedData = allData.map((item) => {
-        const row = {
-          Province:
-            item.sdl_adress?.zone_code?.commune_code?.province_code
-              ?.province_name || "",
-          Commune: item.sdl_adress?.zone_code?.commune_code?.commune_name || "",
-          Zone: item.sdl_adress?.zone_code?.zone_name || "",
-          Colline: item.sdl_adress?.colline_name || "",
-          NON_SDL: item.sdl_nom || "",
-          SOCIETE: item?.societe?.nom_societe || "",
-          NOM_RESPONSABLE: item?.sdl_responsable?.user?.last_name || "",
-          PRENOM_RESPONSABLE: item?.sdl_responsable?.user?.first_name || "",
-          TELEPHONE_RESPONSABLE: item?.sdl_responsable?.user?.phone || "",
-          DATE_CREATION: item?.sdl_responsable?.created_at
-            ? new Date(item.sdl_responsable.created_at).toLocaleString('fr-FR', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
-            })
-            : null
-
-        }
-        if (user?.session?.category === ROLES.ADMIN) {
-          row.CODE_SDL = item?.sdl_code || "";
-        }
-        return row;
-      });
-
-      const worksheet = XLSX.utils.json_to_sheet(formattedData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "hangar");
-      const excelBuffer = XLSX.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-      const blob = new Blob([excelBuffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
-      });
-
-      setExportBlob(blob);
-      setActivedownloadBtn(true);
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
     } finally {
-      setLoadingEportBtn(false);
+      // Le loading reste actif pendant le polling
     }
   };
 
-  const DownloadSDLsToExcel = () => {
-    if (!exportBlob) return;
-    const now = new Date();
-    const date = now.toISOString().split("T")[0];
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const seconds = String(now.getSeconds()).padStart(2, "0");
-    const time = `${hours}_${minutes}_${seconds}`;
-    saveAs(exportBlob, `liste_sdls_et_les_responsables_${date}_${time}.xlsx`);
-    setActivedownloadBtn(false);
-    setExportBlob(null);
-  };
-
-  const [sdlValidationReportId, setSdlValidationReportId] = useState("");
-  const [LoadingSdlValidationBtn, setLoadingSdlValidationBtn] = useState(false);
-  const [ActiveSdlValidationBtn, setActiveSdlValidationBtn] = useState(false);
-  const exportSdlValidationToExcel = async () => {
-    setLoadingSdlValidationBtn(true);
+  const DownloadSDLsToExcel = async () => {
     try {
-      // Étape 1 : Récupérer le nombre total d'enregistrements
-      const initial_export = await fetchData(
-        "get",
-        "cafe/cafe_payments/start_payment_validation_export/",
-        {
-          params: {},
-          additionalHeaders: {},
-          body: {},
-        },
-      );
-      console.log("initial_export", initial_export);
-      if (initial_export?.message == "Export lancé") {
-        const task_id = initial_export?.task_id;
-        let isDone = false;
-        while (!isDone) {
-          const export_excel = await fetchData(
-            "get",
-            "cafe/cafe_payments/check_payment_validation_export/",
-            {
-              params: { task_id: task_id },
-            },
-          );
-          if (export_excel?.export_status === "SUCCESS") {
-            console.log("export_excel", export_excel);
-            setActiveSdlValidationBtn(true);
-            setSdlValidationReportId(task_id);
-            isDone = true;
-          } else {
-            // Attendre 2 secondes avant la prochaine vérification
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-          }
-        }
+      const response = await fetchData("get", "/hangars/download_excel/", {
+        isBlob: true,
+      });
+
+      const blob = new Blob([response.data], {
+        type:
+          response.headers["content-type"] ||
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, "0");
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const year = now.getFullYear();
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+      const timestamp = `${day}_${month}_${year}_${hours}_${minutes}_${seconds}`;
+      let filename = `hangars_list_${timestamp}.xlsx`;
+      const contentDisposition = response.headers["content-disposition"];
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?(.+)"?/);
+        if (match && match[1]) filename = match[1];
       }
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      setActivedownloadBtn(false);
     } catch (error) {
-      console.error("Erreur exportation Excel :", error);
+      console.error("Erreur lors du téléchargement Excel :", error);
     } finally {
-      setLoadingSdlValidationBtn(false);
+      setLoadingEportBtn(false);
     }
   };
   const DownloadSdlValidationToExcel = async () => {

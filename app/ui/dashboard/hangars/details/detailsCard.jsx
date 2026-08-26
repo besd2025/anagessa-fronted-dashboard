@@ -42,14 +42,13 @@ function DetailsCard({ id }) {
     const getSdls = async () => {
       setLoading(true);
       try {
-        const response = await fetchData("get", `cafe/hangars/${id}/`, {
+        const response = await fetchData("get", `hangars/${id}/`, {
           params: {},
           additionalHeaders: {},
           body: {},
         });
 
         setData(response);
-        console.log("response: ", response);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {
@@ -109,8 +108,8 @@ function DetailsCard({ id }) {
           </div>
           <div className="text-xs font-semibold text-center truncate w-full">
             hangar{" "}
-            {data?.sdl_nom
-              ? data.sdl_nom.slice(0, 2).toUpperCase() + "..."
+            {data?.hangar_name
+              ? data.hangar_name.slice(0, 2).toUpperCase() + "..."
               : "--"}
           </div>
           <Separator className="my-2" />
@@ -141,7 +140,7 @@ function DetailsCard({ id }) {
               {loading ? (
                 <Skeleton className="h-7 w-48 mx-auto" />
               ) : (
-                <p className="text-xl font-semibold">hangar {data?.sdl_nom}</p>
+                <p className="text-xl font-semibold">hangar {data?.hangar_name}</p>
               )}
               <p className="text-lg text-primary font-bold flex flex-row justify-center gap-x-2">
                 {""}
@@ -153,7 +152,7 @@ function DetailsCard({ id }) {
             >
               <QrCode size={30} />
               <span className="">
-                {loading ? <Skeleton className="h-6 w-24" /> : data?.sdl_code}
+                {loading ? <Skeleton className="h-6 w-24" /> : data?.hangar_code}
               </span>
             </Badge>
           </div>
@@ -174,12 +173,8 @@ function DetailsCard({ id }) {
                     <Skeleton className="h-5 w-32 ml-auto" />
                   ) : (
                     <>
-                      {
-                        data?.sdl_adress?.zone_code?.commune_code?.province_code
-                          ?.province_name
-                      }{" "}
-                      /{" "}
-                      {data?.sdl_adress?.zone_code?.commune_code?.commune_name}
+                      {data?.province}{" "}/{" "}
+                      {data?.commune}
                     </>
                   )}
                 </span>
@@ -197,8 +192,7 @@ function DetailsCard({ id }) {
                     <Skeleton className="h-5 w-32 ml-auto" />
                   ) : (
                     <>
-                      {data?.sdl_responsable?.user?.first_name}{" "}
-                      {data?.sdl_responsable?.user?.last_name}
+                      {data?.responsable_name}
                     </>
                   )}
                 </span>
@@ -215,12 +209,12 @@ function DetailsCard({ id }) {
                   {loading ? (
                     <Skeleton className="h-5 w-24" />
                   ) : (
-                    data?.sdl_responsable?.user?.phone
+                    data?.responsable_phone
                   )}
                 </span>
               </div>
               <Separator className="my-2" />
-              <div className="flex justify-center"> <AddPrevision sdl_id={data?.sdl_responsable?.id} /></div>
+              <div className="flex justify-center"> <AddPrevision sdl_id={data?.id} /></div>
             </div>
           </div>
         </>

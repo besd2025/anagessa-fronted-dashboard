@@ -23,36 +23,40 @@ import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 import { Separator } from "@/components/ui/separator";
 import { UserContext } from "@/app/context/User_Context";
 function StatsCard({ id }) {
-  const [data, setData] = React.useState([]);
+  const [data, setData] = React.useState({});
   const [loading, setLoading] = React.useState(true);
-  const user = React.useContext(UserContext)
+  const user = React.useContext(UserContext);
   React.useEffect(() => {
     const getSdls = async () => {
       try {
-        const qte_achete = await fetchData(
-          "get",
-          `cafe/hangars/${id}/get_total_achat_par_sdl/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          },
-        );
+        // Logique identique à anagessa_dashboard/cards_overview.jsx
+        const [qte_achete, qte_vendu, transfers, stock_initial, cultivateurs, qte_recues] =
+          await Promise.allSettled([
+            fetchData("get", `hangars/${id}/get_total_achat_par_hangar`, {}),
+            fetchData("get", `hangars/${id}/get_total_vent_par_hangar`, {}),
+            fetchData("get", `hangars/${id}/get_quantity_transferer`, {}),
+            fetchData("get", `hangars/${id}/get_inital_stock_per_hangar`, {}),
+            fetchData("get", `hangars/${id}/get_cultivator_number_per_hangar`, {}),
+            fetchData("get", `hangars/${id}/get_quantity_transferer_received`, {}),
+          ]);
 
-        const nombre_cultivateurs = await fetchData(
-          "get",
-          `cafe/hangars/${id}/get_total_cultivators_sdl/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          },
-        );
+        const achats = qte_achete.status === "fulfilled" ? qte_achete.value : {};
+        const ventes = qte_vendu.status === "fulfilled" ? qte_vendu.value : {};
+        const transfert = transfers.status === "fulfilled" ? transfers.value : {};
+        const stockInit = stock_initial.status === "fulfilled" ? stock_initial.value : {};
+        const cultivs = cultivateurs.status === "fulfilled" ? cultivateurs.value : {};
+        const recues = qte_recues.status === "fulfilled" ? qte_recues.value : {};
 
-        const response = { qte_achete, nombre_cultivateurs };
-        setData(response);
+        const qte_blanc_restante =
+          (achats?.total_blanc || 0) + (recues?.total_blanc || 0) -
+          ((ventes?.total_blanc || 0) + (transfert?.total_blanc || 0));
+        const qte_jaune_restante =
+          (achats?.total_jaune || 0) + (recues?.total_jaune || 0) -
+          ((ventes?.total_jaune || 0) + (transfert?.total_jaune || 0));
+
+        setData({ achats, ventes, transfert, stockInit, cultivs, recues, qte_blanc_restante, qte_jaune_restante });
       } catch (error) {
-        console.error("Error fetching cultivators data:", error);
+        console.error("Error fetching hangars stats data:", error);
       } finally {
         setLoading(false);
       }
@@ -61,11 +65,9 @@ function StatsCard({ id }) {
     getSdls();
   }, [id]);
 
-  const total = data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b || 0;
-  const percentageA =
-    total > 0 ? ((data?.qte_achete?.cerise_a || 0) / total) * 100 : 0;
-  const percentageB =
-    total > 0 ? ((data?.qte_achete?.cerise_b || 0) / total) * 100 : 0;
+  const total = (data?.achats?.total_blanc || 0) + (data?.achats?.total_jaune || 0);
+  const percentageA = total > 0 ? ((data?.achats?.total_blanc || 0) / total) * 100 : 0;
+  const percentageB = total > 0 ? ((data?.achats?.total_jaune || 0) / total) * 100 : 0;
 
   const [avance, setAvance] = React.useState(false);
   if (loading) {
@@ -87,9 +89,9 @@ function StatsCard({ id }) {
               <Archive className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-              {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) >= 1000 ? (
+              {(data?.achats?.total_blanc + data?.achats?.total_jaune) >= 1000 ? (
                 <>
-                  {((data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b) / 1000).toLocaleString("fr-FR", {
+                  {((data?.achats?.total_blanc + data?.achats?.total_jaune) / 1000).toLocaleString("fr-FR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}{" "}
@@ -97,122 +99,77 @@ function StatsCard({ id }) {
                 </>
               ) : (
                 <>
-                  {(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR") || 0}{" "}
+                  {(data?.achats?.total_blanc + data?.achats?.total_jaune)?.toLocaleString("fr-FR") || 0}{" "}
                   <span className="text-sm">Kg</span>
                 </>
               )}
             </CardTitle>
-            {user?.session?.category === "Cafe_Chef_societe" || user?.session?.category === "Superviseur_Regional" ? (
-              <span className="text-sm font-normal text-muted-foreground ml-2">
-                ({(data?.qte_achete?.cerise_a + data?.qte_achete?.cerise_b)?.toLocaleString("fr-FR")} kg)
-              </span>
-            ) : (
-              <></>
-            )}
+            {/* Badge rôles ANAGESSA */}
+            <></>
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums  ">
-            Qte collectee (CAB)
+            Qté collectée (Maïs)
           </CardTitle>
 
           <div className="mt-2 space-y-3 w-full">
             <div className="flex justify-between items-end">
               <span className="text-xs text-muted-foreground ">
-                Rapport Cerise A / B
+                Rapport Maïs Blanc / Jaune
               </span>
-              {/* <span className="text-[10px] font-mono text-muted-foreground">
-                      Ratio: 65%
-                    </span> */}
             </div>
-            {/* Barre de progression professionnelle */}
+            {/* Barre de progression */}
             <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-muted">
-              <div
-                className="bg-primary/90"
-                style={{ width: `${percentageA}%` }}
-              />
-              <div
-                className="bg-secondary/90"
-                style={{ width: `${percentageB}%` }}
-              />
+              <div className="bg-primary/90" style={{ width: `${percentageA}%` }} />
+              <div className="bg-secondary/90" style={{ width: `${percentageB}%` }} />
             </div>
             <div className="flex flex-wrap gap-y-2 justify-between text-xs font-medium">
               <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-max">
                 <span className="text-primary flex items-center gap-1">●</span>
                 <div className="flex flex-row gap-x-1 items-center">
                   <Grape className="text-primary size-5" />
-                  <CardTitle className="text-md font-semibold text-primary">
-                    CA :
-                  </CardTitle>
+                  <CardTitle className="text-md font-semibold text-primary">MB :</CardTitle>
                 </div>
                 <CardDescription className="font-semibold text-accent-foreground text-lg">
-                  {data?.qte_achete?.cerise_a >= 1000 ? (
+                  {(data?.achats?.total_blanc || 0) >= 1000 ? (
                     <>
-                      {(data?.qte_achete?.cerise_a / 1000).toLocaleString(
-                        "fr-FR",
-                        {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        },
-                      )}{" "}
-                      <span className="text-sm">T</span>
+                      {((data?.achats?.total_blanc || 0) / 1000).toLocaleString("fr-FR", {
+                        minimumFractionDigits: 2, maximumFractionDigits: 2,
+                      })}{" "}<span className="text-sm">T</span>
                     </>
                   ) : (
                     <>
-                      {data?.qte_achete?.cerise_a?.toLocaleString("fr-FR") || 0}{" "}
+                      {(data?.achats?.total_blanc || 0).toLocaleString("fr-FR")}{" "}
                       <span className="text-sm">Kg</span>
                     </>
                   )}
-
-                  {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
-                    <span className="text-xs font-normal text-muted-foreground ml-2">
-                      ({percentageA.toFixed(1)}%)
-                    </span>
-                  ) : (
-                    <span className="text-xs font-normal text-muted-foreground ml-2">
-                      ({data?.qte_achete?.cerise_a?.toLocaleString("fr-FR")} kg)
-                    </span>
-                  )}
-
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    ({percentageA.toFixed(1)}%)
+                  </span>
                 </CardDescription>
               </div>
               <span className="w-0.5 h-8 bg-black/20 hidden lg:block"></span>
               <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg">
-                <span className="text-secondary flex items-center gap-1">
-                  ●
-                </span>
+                <span className="text-secondary flex items-center gap-1">●</span>
                 <div className="flex flex-row gap-x-1 items-center">
                   <Grape className="text-secondary size-5" />
-                  <CardTitle className="text-md font-semibold text-secondary">
-                    CB :
-                  </CardTitle>
+                  <CardTitle className="text-md font-semibold text-secondary">MJ :</CardTitle>
                 </div>
                 <CardDescription className="font-semibold text-accent-foreground text-lg">
-                  {data?.qte_achete?.cerise_b >= 1000 ? (
+                  {(data?.achats?.total_jaune || 0) >= 1000 ? (
                     <>
-                      {(data?.qte_achete?.cerise_b / 1000).toLocaleString(
-                        "fr-FR",
-                        {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        },
-                      )}
-                      <span className="text-sm">T</span>
+                      {((data?.achats?.total_jaune || 0) / 1000).toLocaleString("fr-FR", {
+                        minimumFractionDigits: 2, maximumFractionDigits: 2,
+                      })}<span className="text-sm">T</span>
                     </>
                   ) : (
                     <>
-                      {data?.qte_achete?.cerise_b?.toLocaleString("fr-FR") || 0}{" "}
+                      {(data?.achats?.total_jaune || 0).toLocaleString("fr-FR")}{" "}
                       <span className="text-sm">Kg</span>
                     </>
                   )}
-                  {user?.session?.category !== "Cafe_Chef_societe" && user?.session?.category !== "Superviseur_Regional" ? (
-                    <span className="text-xs font-normal text-muted-foreground ml-2">
-                      ({percentageB.toFixed(1)}%)
-                    </span>
-                  ) : (
-                    <span className="text-xs font-normal text-muted-foreground ml-2">
-                      ({data?.qte_achete?.cerise_b?.toLocaleString("fr-FR")} kg)
-                    </span>
-                  )}
-
+                  <span className="text-xs font-normal text-muted-foreground ml-2">
+                    ({percentageB.toFixed(1)}%)
+                  </span>
                 </CardDescription>
               </div>
             </div>
@@ -232,12 +189,9 @@ function StatsCard({ id }) {
           </div>
           <CardTitle className="text-lg font-semibold tracking-tight tabular-nums">
             {(
-              data?.qte_achete?.montant_cerise_a +
-              data?.qte_achete?.montant_cerise_b ?? 0
-            )
-              .toString()
-              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
-            <span className="text-base">FBU</span>
+              (data?.achats?.total_blanc || 0) + (data?.achats?.total_jaune || 0)
+            ).toLocaleString("fr-FR")}{" "}
+            <span className="text-base">Kg</span>
           </CardTitle>
           <Separator />
           <div className="flex flex-col gap-2">

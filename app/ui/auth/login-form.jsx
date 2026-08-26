@@ -35,6 +35,8 @@ export function LoginForm({ className, ...props }) {
           user?.category === "Anagessa" ||
           user?.category === "General"
         ) {
+          console.log(user?.category);
+
           router.push("/anagessa-dashboard/home");
         }
       } else {
@@ -100,7 +102,9 @@ export function LoginForm({ className, ...props }) {
         user?.category === "Anagessa" ||
         user?.category === "General"
       ) {
-        router.push("/dashboard/home");
+        console.log(user?.category);
+
+        router.push("/anagessa-dashboard/home");
       } else if (user?.category === "Communal") {
         router.push("/municipal/cultivators");
       } else if (user?.category === "Provincial") {

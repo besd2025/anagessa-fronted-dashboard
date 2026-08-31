@@ -1,6 +1,13 @@
 "use client";
 import React, { useState } from "react";
-import { AreaChart, CartesianGrid, XAxis, Area, LabelList, LineChart } from "recharts";
+import {
+  AreaChart,
+  CartesianGrid,
+  XAxis,
+  Area,
+  LabelList,
+  LineChart,
+} from "recharts";
 import { TrendingUp } from "lucide-react";
 
 import {
@@ -61,7 +68,10 @@ export function ChartLineAchats() {
               if (!isNaN(date.getTime())) {
                 label = date.toLocaleDateString("fr-FR", {
                   month: "short",
-                  day: period === "jour" || period === "semaine" ? "numeric" : undefined,
+                  day:
+                    period === "jour" || period === "semaine"
+                      ? "numeric"
+                      : undefined,
                   year: period === "annee" ? "numeric" : undefined,
                 });
               }
@@ -101,7 +111,7 @@ export function ChartLineAchats() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Achats du maïs</CardTitle>
+        <CardTitle>Achats & Ventes du maïs</CardTitle>
         <CardDescription>Filtrer par période</CardDescription>
 
         <Tabs
@@ -214,7 +224,8 @@ export function ChartLineAchats() {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 leading-none font-medium">
-          Évolution des Achats & Ventes par {period} <TrendingUp className="h-4 w-4" />
+          Évolution des Achats & Ventes par {period}{" "}
+          <TrendingUp className="h-4 w-4" />
         </div>
       </CardFooter>
     </Card>

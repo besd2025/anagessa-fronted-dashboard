@@ -306,7 +306,7 @@ export function SectionCards() {
       <Card className="@container/card col-span-12 @5xl/main:col-span-3 relative border-rose-500/20">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-3 items-center">
-            <div className="bg-rose-500 p-2.5 rounded-xl shadow-xs text-white">
+            <div className="bg-destructive p-2.5 rounded-xl shadow-xs text-white">
               <Package className="h-5 w-5" />
             </div>
             <div>
@@ -316,7 +316,7 @@ export function SectionCards() {
                   (Avant Campagne)
                 </span>
               </CardDescription>
-              <CardTitle className="text-2xl @[250px]/card:text-3xl font-bold tracking-tight text-rose-600 dark:text-rose-400 tabular-nums">
+              <CardTitle className="text-2xl @[250px]/card:text-3xl font-bold tracking-tight  tabular-nums">
                 {totalStockInit >= 1000 ? (
                   <>
                     {(totalStockInit / 1000).toLocaleString("fr-FR", {
@@ -332,17 +332,6 @@ export function SectionCards() {
                   </>
                 )}
               </CardTitle>
-            </div>
-          </div>
-
-          <div className="mt-3 space-y-2 w-full text-xs">
-            <div className="flex items-center justify-between p-2 rounded-lg bg-rose-50 dark:bg-rose-950/30">
-              <span className="text-muted-foreground">
-                Valeur financière GAP :
-              </span>
-              <span className="font-semibold text-rose-600 dark:text-rose-400">
-                {Math.round(gapPrix).toLocaleString("fr-FR")} FBU
-              </span>
             </div>
           </div>
         </CardHeader>

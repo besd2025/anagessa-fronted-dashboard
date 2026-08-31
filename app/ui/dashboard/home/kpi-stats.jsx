@@ -15,8 +15,14 @@ export function KPIGrid() {
           fetchData("get", "admin/prices/get_prix_vente/"),
         ]);
 
-        const prixAchat = prixAchatRes.status === "fulfilled" ? (prixAchatRes.value?.prix_achat || 0) : 0;
-        const prixVente = prixVenteRes.status === "fulfilled" ? (prixVenteRes.value?.prix_vente || prixVenteRes.value?.prix || 0) : 0;
+        const prixAchat =
+          prixAchatRes.status === "fulfilled"
+            ? prixAchatRes.value?.prix_achat || 0
+            : 0;
+        const prixVente =
+          prixVenteRes.status === "fulfilled"
+            ? prixVenteRes.value?.prix_achat || 0
+            : 0;
 
         const kpiData = [
           {

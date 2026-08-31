@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Package, DollarSign } from "lucide-react";
+import { Package, DollarSign, Squircle } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { StockCardSkeleton } from "@/components/ui/skeletons";
 
@@ -55,7 +55,7 @@ export function StockSummaryCard() {
           </div>
           <div>
             <CardTitle className="text-lg font-semibold">
-              Stock Actuel Hangars
+              Stock Actuel
             </CardTitle>
             <CardDescription className="text-xs">
               État des stocks en temps réel dans les hangars
@@ -66,8 +66,10 @@ export function StockSummaryCard() {
 
       <CardContent className="grid gap-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex flex-col gap-1 p-3 bg-primary/10 rounded-lg">
-            <span className="font-medium text-xs text-muted-foreground">Maïs blanc</span>
+          <div className="flex flex-col gap-1 p-3 bg-secondary/10 rounded-lg">
+            <span className="text-muted-foreground font-medium flex items-center gap-1">
+              <Squircle className="text-secondary size-3.5" /> Maïs Blanc
+            </span>
             <span className="text-2xl font-bold text-primary">
               {stockBlanc >= 1000 ? (
                 <>
@@ -90,7 +92,9 @@ export function StockSummaryCard() {
           </div>
 
           <div className="flex flex-col gap-1 p-3 bg-amber-500/10 rounded-lg">
-            <span className="font-medium text-xs text-muted-foreground">Maïs jaune</span>
+            <span className="text-muted-foreground font-medium flex items-center gap-1">
+              <Squircle className="text-primary size-3.5" /> Maïs Jaune
+            </span>
             <span className="text-2xl font-bold text-amber-600 dark:text-amber-400">
               {stockJaune >= 1000 ? (
                 <>
@@ -120,7 +124,9 @@ export function StockSummaryCard() {
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-medium">Valeur Estimée Stock</span>
-              <span className="text-[10px] text-muted-foreground">Au prix d'achat actuel ({unitPrice} FBU/kg)</span>
+              <span className="text-[10px] text-muted-foreground">
+                Au prix d'achat actuel ({unitPrice} FBU/kg)
+              </span>
             </div>
           </div>
           <span className="text-lg font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
@@ -131,4 +137,3 @@ export function StockSummaryCard() {
     </Card>
   );
 }
-

@@ -1,8 +1,8 @@
-"use client"
+"use client";
 import { SectionCards } from "./cards-sections";
-import { ChartPieSdlCtActive } from "./charts/sdl-hangar-active";
-import { ChartLineAchats } from "./charts/sdl-hangar-achats";
-import { LossChart } from "./charts/loss-chart";
+import { ChartHangarActive } from "./charts/hangar-active";
+import { ChartLineAchats } from "./charts/hangar-achats";
+// import { LossChart } from "./charts/loss-chart";
 import { StockSummaryCard } from "./stock-card";
 import { KPIGrid } from "./kpi-stats";
 import { UserContext } from "@/app/context/User_Context";
@@ -22,7 +22,7 @@ function DashboardContainer() {
               <StockSummaryCard />
             </div>
             <div className="col-span-5 lg:col-span-2 flex flex-col gap-4">
-              <ChartPieSdlCtActive />
+              <ChartHangarActive />
             </div>
           </div>
 
@@ -36,9 +36,9 @@ function DashboardContainer() {
             </div>
           </div>
 
-          <div className="px-4 lg:px-6">
+          {/* <div className="px-4 lg:px-6">
             <LossChart />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

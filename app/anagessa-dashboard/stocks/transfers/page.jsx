@@ -23,29 +23,27 @@ export default function TransfersPage() {
     const fetchDataForActiveTab = async () => {
       try {
         setLoading(true);
-        const response_ct_sdl = await fetchData("get", "mais/transfer_ct_sdl/", {
+        const response_ct_sdl = await fetchData("get", "/transfert/", {
           params: { limit: limit, offset: pointer, search: searchvalue },
         });
-        const results2 = response_ct_sdl.results || [];
+        const results2 = response_ct_sdl?.results || [];
         const mappedCtTransfers = results2.map((transfer) => ({
           id: transfer.id,
-          transfer_sdl_ct_code: transfer?.transfer_ct_sdl_code,
-          from_ct: transfer.Hangar?.ct_nom || "Inconnu",
-          to_depulpeur_name: transfer.hangar?.sdl_nom || "Inconnu",
-          society: transfer.hangar?.societe?.nom_societe,
-          date: transfer?.transfer_date,
-          status: transfer?.est_confirme,
+          transfer_sdl_ct_code: transfer?.code_transfert || `TR-${transfer.id}`,
+          from_ct: transfer?.from_hangar?.hangar_name || transfer?.collector?.hangar?.hangar_name || "Hangar Source",
+          to_depulpeur_name: transfer?.to_hangar?.hangar_name || "Hangar Destination",
+          date: transfer?.transfer_date || transfer?.date_transfert,
+          status: transfer?.est_valide ?? transfer?.est_confirme,
           qte_tranferer: {
-            ca: transfer?.quantite_grains_a,
-            cb: transfer.quantite_grains_b,
+            ca: transfer?.quantity_blanc || transfer?.quantite_blanc || 0,
+            cb: transfer?.quantity_jaune || transfer?.quantite_jaune || 0,
           },
-          photo_fiche: transfer.photo_bordereau,
+          photo_fiche: transfer?.photo_bordereau || transfer?.photo_fiche,
+          chauffeur: transfer?.chauffeur || transfer?.driver_name,
+          accompagnateur: transfer?.accompagnateur,
           localite: {
-            province:
-              transfer.hangar?.sdl_adress?.zone_code?.commune_code?.province_code
-                ?.province_name,
-            commune:
-              transfer.hangar?.sdl_adress?.zone_code?.commune_code?.commune_name,
+            province: transfer?.from_hangar?.province || "N/A",
+            commune: transfer?.from_hangar?.commune || "N/A",
           },
         }));
         setCtTransfers(mappedCtTransfers);

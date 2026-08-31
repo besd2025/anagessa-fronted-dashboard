@@ -87,46 +87,48 @@ export default function IndividualAchatsTable({
     const getAchats = async () => {
       setLoading(true);
       try {
-        const response = await fetchData("get", "mais/achat_mais/", {
-          params: {
-            limit: limit,
-            offset: pointer,
-            ...filterData,
-            search: searchvalue,
-          },
+        const params = {
+          limit: limit,
+          offset: pointer,
+          search: searchvalue,
+        };
+        if (filterData) {
+          if (filterData.province) params.province = filterData.province;
+          if (filterData.commune) params.commune = filterData.commune;
+          if (filterData.zone) params.zone = filterData.zone;
+          if (filterData.QtMin) params.quantite_min = filterData.QtMin;
+          if (filterData.QtMax) params.quantite_max = filterData.QtMax;
+          if (filterData.dateSortie) params.date_achat = filterData.dateSortie;
+          if (filterData.dateFrom) params.date_achat_min = filterData.dateFrom;
+          if (filterData.dateTo) params.date_achat_max = filterData.dateTo;
+        }
+        const response = await fetchData("get", "/achats/", {
+          params,
         });
         const formattedData = response?.results?.map((achat) => ({
           id: achat?.id,
-          responsable_id: achat?.responsable?.unique_code,
+          responsable_id: achat?.collector?.unique_code || achat?.responsable?.unique_code,
           cultivator: {
-            cultivator_id: achat?.cultivateur?.id,
-            cultivator_code: achat?.cultivateur?.cultivator_code,
-            first_name: achat?.cultivateur?.cultivator_first_name,
-            last_name: achat?.cultivateur?.cultivator_last_name,
-            image_url: achat?.cultivateur?.cultivator_photo,
+            cultivator_id: achat?.cultivator?.id || achat?.cultivateur?.id,
+            cultivator_code: achat?.cultivator?.cultivator_code || achat?.cultivateur?.cultivator_code,
+            first_name: achat?.cultivator?.cultivator_first_name || achat?.cultivateur?.first_name,
+            last_name: achat?.cultivator?.cultivator_last_name || achat?.cultivateur?.last_name,
+            image_url: achat?.cultivator?.photo || achat?.cultivateur?.photo,
             cultivator_type: "personel",
           },
-          sdl_ct: achat?.responsable?.sdl_ct?.hangar?.sdl_nom
-            ? "hangar " + achat.responsable.sdl_ct.hangar.sdl_nom
-            : "Hangar " + achat?.responsable?.sdl_ct?.Hangar?.ct_nom,
-          society:
-            achat?.responsable?.sdl_ct?.hangar?.societe?.nom_societe ||
-            achat?.responsable?.sdl_ct?.Hangar?.hangar?.societe?.nom_societe,
+          sdl_ct: achat?.collector?.hangar?.hangar_name || achat?.hangar_name || "Hangar",
           localite: {
-            province:
-              achat?.cultivateur?.cultivator_adress?.zone_code?.commune_code
-                ?.province_code?.province_name || "N/A",
-            commune:
-              achat?.cultivateur?.cultivator_adress?.zone_code?.commune_code
-                ?.commune_name || "N/A",
+            province: achat?.collector?.hangar?.province || achat?.province || "N/A",
+            commune: achat?.collector?.hangar?.commune || achat?.commune || "N/A",
+            zone: achat?.collector?.hangar?.zone || achat?.zone || "N/A",
           },
           in_payment: achat?.in_payment,
-          num_fiche: achat?.cultivateur?.cultivator_assoc_numero_fiche || "0",
+          num_fiche: achat?.numero_fiche || "0",
           num_recu: achat?.numero_recu || "N/A",
           num_page: achat?.numero_page || "N/A",
           photo_fiche: achat?.photo_fiche,
-          ca: achat?.quantite_grains_a || 0,
-          cb: achat?.quantite_grains_b || 0,
+          ca: achat?.quantity_blanc || achat?.quantite_blanc || 0,
+          cb: achat?.quantity_jaune || achat?.quantite_jaune || 0,
           date: achat?.date_achat || "N/A",
           date_creation: achat?.created_at
             ? new Date(achat.created_at).toLocaleString('fr-FR', {
@@ -138,8 +140,6 @@ export default function IndividualAchatsTable({
               second: '2-digit',
             })
             : null
-
-
         }));
         setData(formattedData || []);
         setTotalCount(response?.count || 0);
@@ -159,90 +159,65 @@ export default function IndividualAchatsTable({
   const exportCultivatorsToExcel = async () => {
     setLoadingEportBtn(true);
     try {
-      // Étape 1 : Récupérer le nombre total d'enregistrements
-      const initial_export = await fetchData(
-        "post",
-        "/mais/achat_mais/export_achat_quantites/",
-        {
-          params: {},
-          additionalHeaders: {},
-          body: { cultivateur_type: "personne", export_type: "DETAIL" },
-        },
-      );
-      if (initial_export.data?.status == "PENDING") {
-        setLoadingEportBtn(true);
-        const task_id = initial_export?.data?.report_id;
-        let isDone = false;
-        while (!isDone) {
-          const export_excel = await fetchData(
-            "get",
-            "mais/achat_mais/export_achat_status/",
-            {
-              params: { report_id: task_id },
-            },
-          );
-          if (export_excel.status === "SUCCESS") {
-            setActivedownloadBtn(true);
-            setReportId(task_id);
-            isDone = true;
-          } else {
-            // Attendre 2 secondes avant la prochaine vérification
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-          }
+      let allData = [];
+      let pointer = 0;
+      const batchLimit = 100;
+      let hasMore = true;
+
+      while (hasMore) {
+        const response = await fetchData("get", "/achats/", {
+          params: {
+            offset: pointer,
+            limit: batchLimit,
+            search: searchvalue,
+            ...filterData,
+          },
+        });
+        const currentData = response?.results || [];
+        if (currentData.length === 0) break;
+        allData = [...allData, ...currentData];
+        pointer += batchLimit;
+        if (pointer >= (response?.count || 0)) {
+          hasMore = false;
         }
       }
-    } catch (error) {
-      console.error("Erreur exportation Excel :", error);
-    } finally {
-      setLoadingEportBtn(false);
-    }
-  };
-  const DownloadCultivatorsToExcel = async () => {
-    try {
-      const response = await fetchData("get", "/mais/achat_mais/download/", {
-        params: { report_id: reportId },
-        isBlob: true,
-      });
-      // Créer le blob avec le bon type MIME
-      const blob = new Blob([response.data], {
-        type:
-          response.headers["content-type"] ||
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
 
-      const url = window.URL.createObjectURL(blob);
-      const now = new Date();
-      const day = String(now.getDate()).padStart(2, "0");
-      const month = String(now.getMonth() + 1).padStart(2, "0");
-      const year = now.getFullYear();
-      const hours = String(now.getHours()).padStart(2, "0");
-      const minutes = String(now.getMinutes()).padStart(2, "0");
-      const seconds = String(now.getSeconds()).padStart(2, "0");
-
-      const timestamp = `${day}_${month}_${year}_${hours}_${minutes}_${seconds}`;
-      // Nom du fichier par défaut
-      let filename = `cultivator_list_${timestamp}.xlsx`;
-
-      const contentDisposition = response.headers["content-disposition"];
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="?(.+)"?/);
-        if (match && match[1]) filename = match[1];
+      if (allData.length === 0) {
+        setLoadingEportBtn(false);
+        return;
       }
 
-      // Création du <a> temporaire
+      const formattedData = allData.map((item) => ({
+        Nom: item?.cultivator?.cultivator_first_name || "",
+        Prénom: item?.cultivator?.cultivator_last_name || "",
+        Code: item?.cultivator?.cultivator_code || "",
+        CNI: item?.cultivator?.cultivator_cni || "",
+        "Quantité totale": (item?.quantity_blanc || 0) + (item?.quantity_jaune || 0),
+        "Maïs blanc (kg)": item?.quantity_blanc || 0,
+        "Maïs jaune (kg)": item?.quantity_jaune || 0,
+        Hangar: item?.collector?.hangar?.hangar_name || "",
+        "Date achat": item?.date_achat || "",
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(formattedData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Achats");
+      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const now = new Date();
+      const filename = `achats_mais_${now.toISOString().slice(0, 10)}.xlsx`;
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", filename);
       document.body.appendChild(link);
       link.click();
-
-      // Nettoyage
       link.remove();
       window.URL.revokeObjectURL(url);
-
-      setActivedownloadBtn(false);
     } catch (error) {
-      console.error("Erreur lors de l'exportation Excel :", error);
+      console.error("Erreur exportation Excel achats :", error);
     } finally {
       setLoadingEportBtn(false);
     }

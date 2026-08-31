@@ -16,6 +16,8 @@ import {
   Warehouse,
   Coins,
   Squircle,
+  ArchiveRestore,
+  Package,
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { StatsCardSkeleton } from "@/components/ui/skeletons";
@@ -116,7 +118,7 @@ export function SectionCards() {
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-primary p-2 rounded-md">
-              <Archive className="text-white" />
+              <ArchiveRestore className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
               {totalCollecte >= 1000 ? (
@@ -134,7 +136,7 @@ export function SectionCards() {
                 </>
               )}
             </CardTitle>
-            {user?.session?.category === "Admin" && newQtyToday > 0 && (
+            {/* {user?.session?.category === "Admin" && newQtyToday > 0 && (
               <Badge
                 variant="secondary"
                 className="bg-green-100 dark:bg-green-600/60 text-green-700 dark:text-green-100 px-1 py-0 h-5 ml-4"
@@ -152,10 +154,10 @@ export function SectionCards() {
                   <>{newQtyToday.toLocaleString("fr-FR")} Kg</>
                 )}
               </Badge>
-            )}
+            )} */}
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums  ">
-            Qté Collectée (CAB)
+            Qté Collectée
           </CardTitle>
 
           <div className="mt-2 space-y-3 w-full">
@@ -181,7 +183,7 @@ export function SectionCards() {
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="flex flex-col bg-secondary/10 p-2 rounded-lg">
                 <span className="text-muted-foreground font-medium flex items-center gap-1">
-                  <Squircle className="text-secondary size-3.5" /> Blanc
+                  <Squircle className="text-secondary size-3.5" /> Maïs Blanc
                 </span>
                 <span className="text-lg font-bold text-secondary mt-0.5">
                   {qteBlanc >= 1000
@@ -195,7 +197,7 @@ export function SectionCards() {
 
               <div className="flex flex-col bg-amber-500/10 p-2 rounded-lg">
                 <span className="text-muted-foreground font-medium flex items-center gap-1">
-                  <Squircle className="text-primary size-3.5" /> Jaune
+                  <Squircle className="text-primary size-3.5" /> Maïs Jaune
                 </span>
                 <span className="text-lg font-bold text-primary mt-0.5">
                   {qteJaune >= 1000
@@ -262,9 +264,9 @@ export function SectionCards() {
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="flex flex-col bg-secondary/10 p-2 rounded-lg">
                 <span className="text-muted-foreground font-medium flex items-center gap-1">
-                  <Grape className="text-emerald-600 size-3.5" /> Maïs Blanc
+                  <Squircle className="text-secondary size-3.5" /> Maïs Blanc
                 </span>
-                <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400 mt-0.5">
+                <span className="text-lg font-bold text-secondary mt-0.5">
                   {qteVendueBlanc >= 1000
                     ? `${(qteVendueBlanc / 1000).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} T`
                     : `${qteVendueBlanc.toLocaleString("fr-FR")} Kg`}
@@ -273,9 +275,9 @@ export function SectionCards() {
 
               <div className="flex flex-col bg-amber-500/10 p-2 rounded-lg">
                 <span className="text-muted-foreground font-medium flex items-center gap-1">
-                  <Grape className="text-primary size-3.5" /> Maïs Jaune
+                  <Squircle className="text-primary size-3.5" /> Maïs Jaune
                 </span>
-                <span className="text-sm font-bold text-primary dark:text-amber-400 mt-0.5">
+                <span className="text-lg font-bold text-primary mt-0.5">
                   {qteVendueJaune >= 1000
                     ? `${(qteVendueJaune / 1000).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} T`
                     : `${qteVendueJaune.toLocaleString("fr-FR")} Kg`}
@@ -301,20 +303,23 @@ export function SectionCards() {
       </Card>
 
       {/* Carte 3: GAP & Stock Initial */}
-      <Card className="@container/card col-span-12 @5xl/main:col-span-4 relative border-rose-500/20">
+      <Card className="@container/card col-span-12 @5xl/main:col-span-3 relative border-rose-500/20">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-3 items-center">
             <div className="bg-rose-500 p-2.5 rounded-xl shadow-xs text-white">
-              <TrendingDown className="h-5 w-5" />
+              <Package className="h-5 w-5" />
             </div>
             <div>
               <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Pertes / GAP
+                Stock Initial
+                <span className="text-xs font-normal text-muted-foreground normal-case block">
+                  (Avant Campagne)
+                </span>
               </CardDescription>
               <CardTitle className="text-2xl @[250px]/card:text-3xl font-bold tracking-tight text-rose-600 dark:text-rose-400 tabular-nums">
-                {pertesKg >= 1000 ? (
+                {totalStockInit >= 1000 ? (
                   <>
-                    {(pertesKg / 1000).toLocaleString("fr-FR", {
+                    {(totalStockInit / 1000).toLocaleString("fr-FR", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}{" "}
@@ -322,7 +327,7 @@ export function SectionCards() {
                   </>
                 ) : (
                   <>
-                    {pertesKg.toLocaleString("fr-FR")}{" "}
+                    {totalStockInit.toLocaleString("fr-FR")}{" "}
                     <span className="text-sm font-normal">Kg</span>
                   </>
                 )}
@@ -338,30 +343,6 @@ export function SectionCards() {
               <span className="font-semibold text-rose-600 dark:text-rose-400">
                 {Math.round(gapPrix).toLocaleString("fr-FR")} FBU
               </span>
-            </div>
-
-            <div className="pt-2 border-t">
-              <div className="flex items-center justify-between mb-1">
-                <span className="font-medium text-muted-foreground flex items-center gap-1">
-                  <Warehouse className="size-3.5 text-blue-600" /> Stock Initial
-                  (Avant Campagne)
-                </span>
-                <span className="font-bold">
-                  {totalStockInit >= 1000
-                    ? `${(totalStockInit / 1000).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} T`
-                    : `${totalStockInit.toLocaleString("fr-FR")} Kg`}
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-1 text-[11px] text-muted-foreground">
-                <span>
-                  HZ (Zonal) :{" "}
-                  {stockInitialHZ?.total?.toLocaleString("fr-FR") || 0} kg
-                </span>
-                <span>
-                  HDZ (Désengorgement) :{" "}
-                  {stockInitialHDZ?.total?.toLocaleString("fr-FR") || 0} kg
-                </span>
-              </div>
             </div>
           </div>
         </CardHeader>

@@ -94,162 +94,50 @@ export default function Maps() {
     const loadAllMapData = async () => {
       setLoading(true);
       try {
-        const params = { limit: 100, offset: 0, ...filterData, search };
-        const paramsUdp = { search };
-
-        const [sdlRes, ctRes, udpRes] = await Promise.allSettled([
-          fetchData("get", "mais/hangars/", { params }),
-          fetchData("get", "mais/centres_transite/", { params }),
-          fetchData("get", "mais/usine_deparchage/", { params: paramsUdp })
-        ]);
-
-        const Hangars = sdlRes.status === "fulfilled" && sdlRes.value?.results ? sdlRes.value.results : [];
-        const cts = ctRes.status === "fulfilled" && ctRes.value?.results ? ctRes.value.results : [];
-        const udps = udpRes.status === "fulfilled" && udpRes.value?.results ? udpRes.value.results : [];
-
-        // 1. Process Hangars (uses cultivators as fallback for coordinates, and fetch stats)
-        const sdlPlaces = await Promise.all(Hangars.map(async (hangar) => {
-          let coords = null;
-
-          try {
-            const cultRes = await fetchData("get", `mais/hangars/${hangar.id}/get_cultivators/`, { params: { limit: 1 } });
-            if (cultRes?.results?.length > 0) {
-              const c = cultRes.results[0];
-              if (c.latitude && c.longitude) {
-                coords = [parseFloat(c.latitude), parseFloat(c.longitude)];
-              }
-            }
-          } catch (e) {
-            console.error("Error fetching map cultivators for hangar", e);
-          }
-
-          if (!coords || isNaN(coords[0]) || isNaN(coords[1])) {
-            coords = null;
-          }
-
-          let stats = { qte_achete: { grains_a: 0, grains_b: 0 }, nombre_cultivateurs: 0 };
-          try {
-            const [qteRes, cultCountRes] = await Promise.allSettled([
-              fetchData("get", `mais/hangars/${hangar.id}/get_total_achat_par_sdl/`),
-              fetchData("get", `mais/hangars/${hangar.id}/get_total_cultivators_sdl/`)
-            ]);
-            if (qteRes.status === "fulfilled") stats.qte_achete = qteRes.value || stats.qte_achete;
-            if (cultCountRes.status === "fulfilled") {
-              stats.nombre_cultivateurs = (cultCountRes.value?.hommes || 0) + (cultCountRes.value?.femmes || 0);
-            }
-          } catch (e) { }
-
-          const province = hangar.sdl_adress?.zone_code?.commune_code?.province_code?.province_name || "";
-          const commune = hangar.sdl_adress?.zone_code?.commune_code?.commune_name || "";
-
-          return {
-            id: hangar.id,
-            name: hangar.sdl_nom || "hangar",
-            coordinates: coords,
-            type: "hangar",
-            address: `${province}, ${commune}`,
-            stockCA: stats.qte_achete?.grains_a || 0,
-            stockCB: stats.qte_achete?.grains_b || 0,
-            stockCAB: (stats.qte_achete?.grains_a || 0) + (stats.qte_achete?.grains_b || 0),
-            farmersCount: stats.nombre_cultivateurs,
-          };
-        }));
-
-        // 2. Process CTs
-        const ctPlaces = await Promise.all(cts.map(async (Hangar) => {
-          let coords = null;
-          if (Hangar.ct_adress?.latitude && Hangar.ct_adress?.longitude) {
-            coords = [parseFloat(Hangar.ct_adress.latitude), parseFloat(Hangar.ct_adress.longitude)];
-          } else if (Hangar.latitude && Hangar.longitude) {
-            coords = [parseFloat(Hangar.latitude), parseFloat(Hangar.longitude)];
-          }
-          try {
-            const cultRes = await fetchData("get", `mais/centres_transite/${Hangar.id}/get_cultivators/`, { params: { limit: 1 } });
-            if (cultRes?.results?.length > 0) {
-              const c = cultRes.results[0];
-              if (c.latitude && c.longitude) {
-                coords = [parseFloat(c.latitude), parseFloat(c.longitude)];
-              }
-            }
-          } catch (e) {
-            console.error("Error fetching map cultivators for Hangar", e);
-          }
-          if (!coords || isNaN(coords[0]) || isNaN(coords[1])) {
-             // Fallback vers les anciennes coordonnées par défaut pour forcer l'affichage
-            coords = [-3.3896077 + (Math.random() * 0.02 - 0.01), 29.9255809 + (Math.random() * 0.02 - 0.01)];
-          }
-          let stats = { qte_achete: { grains_a: 0, grains_b: 0 }, nombre_cultivateurs: 0 };
-          try {
-            const [qteRes, cultCountRes] = await Promise.allSettled([
-              fetchData("get", `mais/centres_transite/${Hangar.id}/get_total_achat_par_ct/`),
-              fetchData("get", `mais/centres_transite/${Hangar.id}/get_total_cultivators_ct/`)
-            ]);
-            if (qteRes.status === "fulfilled") stats.qte_achete = qteRes.value || stats.qte_achete;
-            if (cultCountRes.status === "fulfilled") {
-              stats.nombre_cultivateurs = (cultCountRes.value?.hommes || 0) + (cultCountRes.value?.femmes || 0);
-            }
-          } catch (e) { }
-          const province = Hangar.ct_adress?.zone_code?.commune_code?.province_code?.province_name || "";
-          const commune = Hangar.ct_adress?.zone_code?.commune_code?.commune_name || "";
-
-          return {
-            id: Hangar.id,
-            name: Hangar.ct_nom || "Hangar",
-            coordinates: coords,
-            type: "Hangar",
-            address: `${province}, ${commune}`,
-            stockCA: stats.qte_achete?.grains_a || 0,
-            stockCB: stats.qte_achete?.grains_b || 0,
-            stockCAB: (stats.qte_achete?.grains_a || 0) + (stats.qte_achete?.grains_b || 0),
-            farmersCount: stats.nombre_cultivateurs,
-          };
-        }));
-
-        // 3. Process UDPs (user specifically asked to ignore fallback data if missing)
-        const udpPlaces = udps.map((udp) => {
-          let coords = null;
-          if (udp.usine_adress?.latitude && udp.usine_adress?.longitude) {
-            coords = [parseFloat(udp.usine_adress.latitude), parseFloat(udp.usine_adress.longitude)];
-          } else if (udp.latitude && udp.longitude) {
-            coords = [parseFloat(udp.latitude), parseFloat(udp.longitude)];
-          }
-
-          if (!coords || isNaN(coords[0]) || isNaN(coords[1])) {
-            coords = null;
-          }
-
-          const province = udp.usine_adress?.zone_code?.commune_code?.province_code?.province_name || "";
-          const commune = udp.usine_adress?.zone_code?.commune_code?.commune_name || "";
-
-          return {
-            id: udp.id,
-            name: udp.usine_name || "UDP",
-            coordinates: coords,
-            type: "UDP",
-            address: `${province}, ${commune}`,
-            stockmaisVert: 0,
-          };
+        const response = await fetchData("get", "site_aggregates/", {
+          params: {},
+          additionalHeaders: {},
+          body: {},
         });
+
+        const aggregates = Array.isArray(response) ? response : [];
+        const hangarPlaces = aggregates
+          .filter((item) => item?.latitude && item?.longitude)
+          .map((item, index) => {
+            const province =
+              item?.hangar?.hangar_adress?.commune_code?.province_code
+                ?.province_name || item?.hangar?.province || "";
+            const commune =
+              item?.hangar?.hangar_adress?.commune_code?.commune_name ||
+              item?.hangar?.commune || "";
+            const zone =
+              item?.hangar?.hangar_adress?.zone_name || item?.hangar?.zone || "";
+
+            return {
+              id: item?.hangar?.id || index,
+              name: item?.hangar?.hangar_name || item?.site_name || "Hangar",
+              coordinates: [parseFloat(item.latitude), parseFloat(item.longitude)],
+              type: "Hangar",
+              address: `${province}, ${commune}${zone ? ` (${zone})` : ""}`,
+              stockCA: item?.quantity_total_blanc || 0,
+              stockCB: item?.quantity_total_jaune || 0,
+              stockCAB:
+                (item?.quantity_total_blanc || 0) +
+                (item?.quantity_total_jaune || 0),
+              farmersCount: item?.total_cultivators || 0,
+            };
+          });
 
         if (isMounted) {
           const finalMapData = [
             {
               ...TYPE_TEMPLATE[0], // Hangar
-              places: ctPlaces.filter(p => p.coordinates)
+              places: hangarPlaces,
             },
-            {
-              ...TYPE_TEMPLATE[1], // hangar
-              places: sdlPlaces.filter(p => p.coordinates)
-            },
-            {
-              ...TYPE_TEMPLATE[2], // UDP
-              places: udpPlaces.filter(p => p.coordinates) // Les UDPs sans donnees (coords manquantes) sont completement ignores / filtres.
-            }
           ];
 
           setData(finalMapData);
         }
-
       } catch (error) {
         console.error("Error loading map data:", error);
       } finally {

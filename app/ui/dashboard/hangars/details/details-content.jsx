@@ -86,64 +86,44 @@ function DetailsContent({ id }) {
   );
   const getAchatsSDls = async () => {
     try {
-      const type =
-        achatCultivateur_type === "achat_cultivator_individual"
-          ? "personne"
-          : "association";
       const response = await fetchData(
         "get",
-        `cafe/hangars/${id}/get_achats/`,
+        `hangars/${id}/achats/`,
         {
           params: {
-            cafeiculteur_type: type,
             limit: limitAchat,
             offset: pointerAchat,
           },
         },
       );
-      const results = response?.results;
+      const results = response?.results || [];
       const formatData = (achats) => ({
         id: achats?.id,
         in_payment: achats?.in_payment,
         cultivator: {
-          cultivator_id: achats?.cafeiculteur?.id,
-          cultivator_code: achats?.cafeiculteur?.cultivator_code,
-          first_name: achats?.cafeiculteur?.cultivator_first_name,
-          last_name: achats?.cafeiculteur?.cultivator_last_name,
-          image_url: achats?.cafeiculteur?.cultivator_photo,
-          cultivator_assoc_name: achats?.cafeiculteur?.cultivator_assoc_name,
-          cultivator_assoc_rep_name:
-            achats?.cafeiculteur?.cultivator_assoc_rep_name,
-          cultivator_type:
-            type === "association" ? "association" : "individual",
+          cultivator_id: achats?.cultivator?.id || achats?.cultivateur?.id,
+          cultivator_code: achats?.cultivator?.cultivator_code || achats?.cultivateur?.cultivator_code,
+          first_name: achats?.cultivator?.cultivator_first_name || achats?.cultivateur?.first_name,
+          last_name: achats?.cultivator?.cultivator_last_name || achats?.cultivateur?.last_name,
+          image_url: achats?.cultivator?.photo || achats?.cultivateur?.photo,
+          cultivator_type: "individual",
         },
         localite: {
-          province:
-            achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
-              ?.province_code?.province_name,
-          commune:
-            achats?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
-              ?.commune_name,
+          province: achats?.cultivator?.province || achats?.province || "N/A",
+          commune: achats?.cultivator?.commune || achats?.commune || "N/A",
         },
-        num_fiche: achats?.cafeiculteur?.cultivator_assoc_numero_fiche,
-        num_recu: achats?.numero_recu,
+        num_fiche: achats?.numero_fiche || "0",
+        num_recu: achats?.numero_recu || "N/A",
         photo_fiche: achats?.photo_fiche,
-        ca: achats?.quantite_cerise_a,
-        cb: achats?.quantite_cerise_b,
+        ca: achats?.quantity_blanc || achats?.quantite_blanc || 0,
+        cb: achats?.quantity_jaune || achats?.quantite_jaune || 0,
         date: achats?.date_achat,
-        isAssociation: !!achats?.cafeiculteur?.cultivator_assoc_name,
       });
 
       const formattedResults = results?.map(formatData) || [];
       setTotalCountAchat(response?.count || 0);
-
-      if (type === "personne") {
-        setIndividualAchatsData(formattedResults);
-        setAssociationAchatsData([]);
-      } else {
-        setAssociationAchatsData(formattedResults);
-        setIndividualAchatsData([]);
-      }
+      setIndividualAchatsData(formattedResults);
+      setAssociationAchatsData([]);
     } catch (error) {
       console.error("Error fetching achats data:", error);
     }
@@ -153,37 +133,32 @@ function DetailsContent({ id }) {
     try {
       const response = await fetchData(
         "get",
-        `cafe/hangars/${id}/get_cultivators/`,
+        `hangars/${id}/cultivateurs_list/`,
         {
           params: { limit: limit, offset: pointer },
         },
       );
-      const results = response?.results;
+      const results = response?.results || [];
       const cultivatorsData = results?.map((cultivator) => ({
         id: cultivator?.id,
         cultivator: {
           cultivator_code: cultivator?.cultivator_code,
-          first_name: cultivator?.cultivator_first_name,
-          last_name: cultivator?.cultivator_last_name,
-          image_url: cultivator?.cultivator_photo,
-          telephone: cultivator?.cultivator_telephone,
+          first_name: cultivator?.first_name || cultivator?.cultivator_first_name,
+          last_name: cultivator?.last_name || cultivator?.cultivator_last_name,
+          image_url: cultivator?.photo || cultivator?.cultivator_photo,
+          telephone: cultivator?.telephone || cultivator?.cultivator_telephone,
         },
         in_payment: cultivator?.in_payment,
-        cni: cultivator?.cultivator_cni,
-        cni_image_url: cultivator?.cultivator_cni_photo,
+        cni: cultivator?.cni || cultivator?.cultivator_cni,
+        cni_image_url: cultivator?.cni_photo || cultivator?.cultivator_cni_photo,
         localite: {
-          province:
-            cultivator?.cultivator_adress?.zone_code?.commune_code
-              ?.province_code?.province_name,
-          commune:
-            cultivator?.cultivator_adress?.zone_code?.commune_code
-              ?.commune_name,
+          province: cultivator?.province || "N/A",
+          commune: cultivator?.commune || "N/A",
         },
-        champs: cultivator?.nombre_champs,
+        champs: cultivator?.nombre_champs || 1,
       }));
       setIndividualCultivatorsData(cultivatorsData);
-      console.log("individualCultivatorsData", cultivatorsData);
-      setTotalCount(response?.count);
+      setTotalCount(response?.count || 0);
     } catch (error) {
       console.error("Error fetching cultivators data:", error);
     }
@@ -238,34 +213,26 @@ function DetailsContent({ id }) {
     try {
       const response = await fetchData(
         "get",
-        `cafe/hangars/${id}/get_transferts/`,
+        `hangars/${id}/transfers/`,
         {
           params: {},
         },
       );
-      const results = response?.results
-      console.log("results", results);
+      const results = response?.results || [];
       const transferData = results?.map((transfer) => ({
         id: transfer?.id,
-        code: transfer?.transfer?.hangar?.sdl_code,
-        date_transfert: transfer?.transfer?.transfer_date,
-        from_sdl: transfer?.transfer?.hangar?.sdl_nom,
-        society: transfer?.transfer?.hangar?.societe?.nom_societe,
-        qte_total_tranferer: transfer?.quantite,
+        code: transfer?.code_transfert || `TR-${transfer?.id}`,
+        date_transfert: transfer?.transfer_date || transfer?.date_transfert,
+        from_sdl: transfer?.from_hangar?.hangar_name || "Hangar",
+        qte_total_tranferer: (transfer?.quantity_blanc || 0) + (transfer?.quantity_jaune || 0),
         qte_tranferer: {
-          ca: transfer?.quantite,
-          cb: transfer?.quantite_cerise_b,
+          ca: transfer?.quantity_blanc || 0,
+          cb: transfer?.quantity_jaune || 0,
         },
-        photo_fiche: transfer?.transfer?.photo_bordereau,
+        photo_fiche: transfer?.photo_bordereau || transfer?.photo_fiche,
         localite: {
-          province:
-            transfer?.transfer?.hangar?.sdl_adress?.zone_code?.commune_code?.province_code
-              ?.province_name,
-          commune:
-            transfer?.transfer?.hangar?.sdl_adress?.zone_code?.commune_code?.commune_name,
-        },
-        usine: {
-          name: transfer?.transfer?.usine_deparchage?.usine_name,
+          province: transfer?.from_hangar?.province || "N/A",
+          commune: transfer?.from_hangar?.commune || "N/A",
         },
       }));
       setTransferData(transferData);
@@ -277,37 +244,28 @@ function DetailsContent({ id }) {
     try {
       const response = await fetchData(
         "get",
-        `cafe/hangars/${id}/get_transferts_recus/`,
+        `hangars/${id}/receptions/`,
         {
           params: {},
         },
       );
-      const results = response?.results;
+      const results = response?.results || [];
       const transferData = results?.map((transfer) => ({
         ...transfer,
         id: transfer?.id,
-        code: transfer?.ct?.ct_code || transfer?.transfer_ct_sdl_code,
-        transfer_ct_sdl_code: transfer?.transfer_ct_sdl_code,
-        from_sdl: transfer?.ct?.ct_nom,
-        society: transfer?.ct?.hangar?.societe?.nom_societe || transfer?.hangar?.societe?.nom_societe,
-        date_transfert: transfer?.enregitrement_date,
-        qte_total_tranferer: transfer?.qte_total_tranferer,
+        code: transfer?.code_transfert || `TR-${transfer?.id}`,
+        from_sdl: transfer?.from_hangar?.hangar_name || "Hangar Source",
+        date_transfert: transfer?.transfer_date || transfer?.date_transfert,
+        qte_total_tranferer: (transfer?.quantity_blanc || 0) + (transfer?.quantity_jaune || 0),
         qte_tranferer: {
-          ca: transfer?.quantite_cerise_a,
-          cb: transfer?.quantite_cerise_b,
+          ca: transfer?.quantity_blanc || 0,
+          cb: transfer?.quantity_jaune || 0,
         },
-        photo_fiche: transfer.photo_bordereau,
-        localite: {
-          province:
-            transfer.hangar?.sdl_adress?.zone_code?.commune_code?.province_code
-              ?.province_name,
-          commune:
-            transfer.hangar?.sdl_adress?.zone_code?.commune_code?.commune_name,
-        },
+        photo_fiche: transfer?.photo_bordereau || transfer?.photo_fiche,
       }));
       setReceptionSdl(transferData);
     } catch (error) {
-      console.error("Error fetching transfers data:", error);
+      console.error("Error fetching receptions data:", error);
     }
   };
 

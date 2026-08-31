@@ -25,7 +25,9 @@ export default function CultivatorsListTable({
     // Si on est dans la page hangar (mode contrôlé), on notifie le parent pour fetcher le bon type
     if (!isCultivatorsPage && fetchCultivatorsByType) {
       fetchCultivatorsByType(
-        value === "individual" ? "cultivator_individual" : "cultivator_association"
+        value === "individual"
+          ? "cultivator_individual"
+          : "cultivator_association",
       );
     }
   };

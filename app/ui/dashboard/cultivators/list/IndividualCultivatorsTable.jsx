@@ -110,29 +110,30 @@ export default function IndividualCultivatorsTable({
           if (filterData.dateFrom) params.created_at_min = filterData.dateFrom;
           if (filterData.dateTo) params.created_at_max = filterData.dateTo;
         }
-        const response = await fetchData(
-          "get",
-          "/cultivators/",
-          { params },
-        );
+        const response = await fetchData("get", "/cultivators/", { params });
+
         const formattedData = response.results.map((cultivator) => ({
           id: cultivator.id,
           cultivator: {
             cultivator_code: cultivator?.cultivator_code,
-            first_name: cultivator?.first_name,
-            last_name: cultivator?.last_name,
-            image_url: cultivator?.photo,
-            telephone: cultivator?.telephone,
+            first_name: cultivator?.cultivator_first_name,
+            last_name: cultivator?.cultivator_last_name,
+            image_url: cultivator?.cultivator_photo,
+            telephone: cultivator?.cultivator_telephone,
           },
-          cni: cultivator?.cni,
-          in_payment: cultivator?.in_payment,
-          cni_image_url: cultivator?.cni_photo,
-          hangar: cultivator?.hangar?.hangar_name || cultivator?.hangar_name,
+          cni: cultivator?.cultivator_cni,
+          in_payment: cultivator?.cultivator_in_payment,
+          cni_image_url: cultivator?.cultivator_cni_photo,
+          hangar: cultivator?.collector?.hangar?.hangar_name,
           localite: {
-            province: cultivator?.province,
-            commune: cultivator?.commune,
-            zone: cultivator?.zone,
-            colline: cultivator?.colline,
+            province:
+              cultivator?.cultivator_adress?.zone_code?.commune_code
+                ?.province_code?.province_name,
+            commune:
+              cultivator?.cultivator_adress?.zone_code?.commune_code
+                ?.commune_name,
+            zone: cultivator?.cultivator_adress?.zone_code?.zone_name,
+            colline: cultivator?.cultivator_adress?.colline_name,
           },
           genre: cultivator?.genre,
           age: cultivator?.age,
@@ -245,21 +246,15 @@ export default function IndividualCultivatorsTable({
   };
 
   const HandleDelete = async (id, code) => {
-
     setLoading(true);
 
     const promise = new Promise(async (resolve, reject) => {
       try {
-        await fetchData(
-          "delete",
-          `/cultivators/${id}/`,
-          {
-            params: {},
-            additionalHeaders: {},
-
-          },
-        );
-        resolve({ code: code || 'Le cultivateur' });
+        await fetchData("delete", `/cultivators/${id}/`, {
+          params: {},
+          additionalHeaders: {},
+        });
+        resolve({ code: code || "Le cultivateur" });
       } catch (error) {
         reject(error);
       }
@@ -316,7 +311,8 @@ export default function IndividualCultivatorsTable({
                 >
                   <DropdownMenuItem>Profile</DropdownMenuItem>
                 </Link>
-                {user?.session?.category === "Admin" || user?.session?.category === "Superviseur" ? (
+                {user?.session?.category === "Admin" ||
+                user?.session?.category === "Superviseur" ? (
                   result?.in_payment ? (
                     " "
                   ) : (
@@ -329,13 +325,16 @@ export default function IndividualCultivatorsTable({
                         champs={result?.champs}
                       />
                       <DropdownMenuItem
-                        onSelect={() => HandleDelete(result?.id, cultivator?.cultivator_code)}
+                        onSelect={() =>
+                          HandleDelete(result?.id, cultivator?.cultivator_code)
+                        }
                         className="text-destructive"
                       >
                         <UserX className="text-destructive" /> Delete
                       </DropdownMenuItem>
                     </div>
-                  )) : (
+                  )
+                ) : (
                   " "
                 )}
               </DropdownMenuContent>
@@ -350,7 +349,7 @@ export default function IndividualCultivatorsTable({
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            cultivateur
+            Cultivateur
             <ArrowUpDownIcon />
           </Button>
         ),
@@ -419,39 +418,22 @@ export default function IndividualCultivatorsTable({
       },
       ...(isCultivatorsPage
         ? [
-          {
-            accessorKey: "sdl_ct",
-            header: ({ column }) => (
-              <Button
-                variant="ghost"
-                onClick={() =>
-                  column.toggleSorting(column.getIsSorted() === "asc")
-                }
-              >
-                Hangar
-                <ArrowUpDownIcon />
-              </Button>
-            ),
-            cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
-          },
-          {
-            accessorKey: "society",
-            header: ({ column }) => (
-              <Button
-                variant="ghost"
-                onClick={() =>
-                  column.toggleSorting(column.getIsSorted() === "asc")
-                }
-              >
-                Société
-                <ArrowUpDownIcon />
-              </Button>
-            ),
-            cell: ({ row }) => (
-              <div className="font-medium">{row.getValue("society")}</div>
-            ),
-          },
-        ]
+            {
+              accessorKey: "hangar",
+              header: ({ column }) => (
+                <Button
+                  variant="ghost"
+                  onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === "asc")
+                  }
+                >
+                  Hangar
+                  <ArrowUpDownIcon />
+                </Button>
+              ),
+              cell: ({ row }) => <div>{row.getValue("hangar")}</div>,
+            },
+          ]
         : []),
       {
         id: "localite",
@@ -511,7 +493,6 @@ export default function IndividualCultivatorsTable({
     setPagination((prev) => ({ ...prev, pageSize: newLimit, pageIndex: 0 }));
   };
 
-
   return (
     <div className="w-full bg-sidebar p-2 rounded-lg">
       <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
@@ -529,7 +510,7 @@ export default function IndividualCultivatorsTable({
           <div className="flex items-center gap-3">
             <IndividualFilter handleFilter={setFilterData} />
           </div>
-          {(user?.session?.category === "Admin") && (
+          {user?.session?.category === "Admin" && (
             <div className="flex items-center gap-3 text-gray-700">
               <ExportButton
                 exportType="cultivator_individual"
@@ -548,7 +529,9 @@ export default function IndividualCultivatorsTable({
                 }}
                 loading={LoadingEportBtn}
                 activedownloadBtn={externalExportFn ? false : ActivedownloadBtn}
-                onClickDownloadButton={externalExportFn ? undefined : DownloadCultivatorsToExcel}
+                onClickDownloadButton={
+                  externalExportFn ? undefined : DownloadCultivatorsToExcel
+                }
               />
             </div>
           )}
@@ -567,9 +550,9 @@ export default function IndividualCultivatorsTable({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -612,7 +595,7 @@ export default function IndividualCultivatorsTable({
         {/* Mode hangar : utiliser la pagination du parent. Mode autonome : pagination interne */}
         {!isCultivatorsPage && datapagination ? (
           <PaginationContent
-            datapaginationlimit={() => { }}
+            datapaginationlimit={() => {}}
             currentPage={datapagination.currentPage}
             totalPages={datapagination.totalPages}
             onPageChange={datapagination.onPageChange}
@@ -623,7 +606,7 @@ export default function IndividualCultivatorsTable({
           />
         ) : (
           <PaginationContent
-            datapaginationlimit={(l) => { }}
+            datapaginationlimit={(l) => {}}
             currentPage={currentPage}
             totalPages={Math.ceil(totalCount / limit)}
             onPageChange={onPageChange}

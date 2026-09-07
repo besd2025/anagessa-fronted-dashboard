@@ -19,26 +19,18 @@ export function SummaryCards() {
   React.useEffect(() => {
     const getCultivators = async () => {
       try {
-        const response = await fetchData(
+
+        const count_cultivateurs = await fetchData(
           "get",
-          `/mais/hangars/get_total_cultivators/`,
+          `cultivators/total_cultivators/`,
           {
             params: {},
             additionalHeaders: {},
             body: {},
           },
         );
-        const response2 = await fetchData(
-          "get",
-          `/cultivators/get_mais_cultivateurs_par_entite_type/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          },
-        );
-        setData(response);
-        setResultsData(response2);
+        console.log("count_cultivateurs", count_cultivateurs);
+        setData(count_cultivateurs);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {
@@ -74,49 +66,18 @@ export function SummaryCards() {
           <CardTitle className="text-lg font-semibold tabular-nums ml-2">
             Total cultivateurs
           </CardTitle>
-          {/* <CardAction>
-            <Badge variant="secondary">
-              <IconTrendingUp />
-              +12.5%
-            </Badge>
-          </CardAction> */}
         </CardHeader>
       </Card>
-      {/* <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
-          <CardTitle className=" font-medium">Hommes</CardTitle>
-          <User className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{data?.hommes}</div>
-          <p className="text-xs text-muted-foreground">
-            {((data?.hommes / data?.total_cultivators) * 100).toFixed(1)}% du
-            total
-          </p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
-          <CardTitle className="font-medium">Femmes</CardTitle>
-          <User className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{data?.femmes}</div>
-          <p className="text-xs text-muted-foreground">
-            {((data?.femmes / data?.total_cultivators) * 100).toFixed(1)}% du
-            total
-          </p>
-        </CardContent>
-      </Card> */}
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
           <CardTitle className=" font-medium">Physiques</CardTitle>
           <User className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{resultsData?.personne}</div>
+          <div className="text-2xl font-bold">{data?.total_cultivators}</div>
           <p className="text-xs text-muted-foreground">
-            {((resultsData?.personne / data?.total_cultivators) * 100).toFixed(1)}% du
+            {((data?.total_cultivators / data?.total_cultivators) * 100).toFixed(1)}% du
             total
           </p>
         </CardContent>
@@ -129,9 +90,9 @@ export function SummaryCards() {
           <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{resultsData?.association}</div>
+          <div className="text-2xl font-bold">{resultsData?.association || 0}</div>
           <p className="text-xs text-muted-foreground">
-            {((resultsData?.association / data?.total_cultivators) * 100).toFixed(1)}% du
+            {((resultsData?.association || 0 / data?.total_cultivators) * 100).toFixed(1) || 0}% du
             total
           </p>
         </CardContent>

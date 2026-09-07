@@ -43,7 +43,7 @@ export function GenreChart() {
       try {
         const response = await fetchData(
           "get",
-          `/mais/hangars/get_total_cultivators/`,
+          `cultivators/stats_genre/`,
           {
             params: {},
             additionalHeaders: {},

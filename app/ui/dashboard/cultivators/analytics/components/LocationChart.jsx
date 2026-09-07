@@ -45,7 +45,7 @@ export function LocationChart() {
       try {
         const response = await fetchData(
           "get",
-          `mais/hangars/get_count_cultivators_par_provinces/`,
+          `cultivators/classement_par_province/`,
 
           {
             params: {},
@@ -53,10 +53,9 @@ export function LocationChart() {
             body: {},
           }
         );
-
-        const provinceData = response.map((item) => ({
-          name: item?.province_name,
-          count: item?.count_cultivators,
+        const provinceData = response?.classement_par_province?.map((item) => ({
+          name: item?.province,
+          count: item?.nombre,
         }));
 
         const regionData = [

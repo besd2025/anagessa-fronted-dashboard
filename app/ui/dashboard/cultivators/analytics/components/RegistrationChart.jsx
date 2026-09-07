@@ -53,7 +53,7 @@ export function RegistrationChart() {
                 : "month";
         const results = await fetchData(
           "get",
-          `/mais/hangars/cultivateurs_statistiques_par_temps?period=${periodParam}`,
+          `cultivators/statistiques_par_temps?period=${periodParam}`,
           { params: {}, additionalHeaders: {}, body: {} }
         );
 
@@ -102,10 +102,11 @@ export function RegistrationChart() {
           onValueChange={handleTimePeriodChange}
           className="w-full lg:w-[250px]"
         >
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="jour">Jour</TabsTrigger>
             <TabsTrigger value="semaine">Semaine</TabsTrigger>
             <TabsTrigger value="mois">Mois</TabsTrigger>
+            <TabsTrigger value="annee">Année</TabsTrigger>
           </TabsList>
         </Tabs>
       </CardHeader>

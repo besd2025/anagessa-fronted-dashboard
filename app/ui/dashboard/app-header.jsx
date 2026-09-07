@@ -64,16 +64,15 @@ const menuItems = {
   },
 };
 const deconnecter = () => {
-  localStorage.removeItem("Access_Token");
+  localStorage.removeItem("AccessToken");
   window.location.href = "/";
 };
 
 export function AppHeader() {
   const user = React.useContext(UserContext);
   console.log(user);
-  const initials = `${user?.session?.first_name?.[0] || ""}${
-    user?.session?.last_name?.[0] || ""
-  }`.toUpperCase();
+  const initials = `${user?.session?.first_name?.[0] || ""}${user?.session?.last_name?.[0] || ""
+    }`.toUpperCase();
 
   return (
     <div className="">

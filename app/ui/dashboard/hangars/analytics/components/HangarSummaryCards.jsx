@@ -8,20 +8,20 @@ import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 export function HangarSummaryCards() {
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [hangarEnActivite, setHangarEnActivite] = React.useState([]);
   React.useEffect(() => {
     const getSdls = async () => {
       try {
-        const response = await fetchData(
-          "get",
-          `cafe/hangars/get_active_and_non_active_sdl/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          }
-        );
+        const hangar_en_activit = await fetchData("get", "hangar_with_stats/", {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        });
 
-        setData(response);
+
+        setHangarEnActivite(hangar_en_activit);
+
+
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {
@@ -51,7 +51,7 @@ export function HangarSummaryCards() {
               <Building2 className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums ml-2">
-              {data?.total_sdl}
+              {hangarEnActivite?.total_hangars}
             </CardTitle>
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums ml-2">
@@ -66,10 +66,10 @@ export function HangarSummaryCards() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {data?.achat_cafes_sdl?.toLocaleString()}
+            {hangarEnActivite?.hangars_avec_collecteur}
           </div>
           <p className="text-xs text-muted-foreground">
-            {((data?.achat_cafes_sdl / data?.total_sdl) * 100)?.toFixed(1)}% du
+            {((hangarEnActivite?.hangars_avec_collecteur / hangarEnActivite?.total_hangars) * 100)?.toFixed(1)}% du
             total
           </p>
         </CardContent>
@@ -81,11 +81,10 @@ export function HangarSummaryCards() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {data?.inactive_sdl?.toLocaleString()}
+            {hangarEnActivite?.total_hangars - hangarEnActivite?.hangars_avec_collecteur}
           </div>
           <p className="text-xs text-muted-foreground">
-            {((data?.inactive_sdl / data?.total_sdl) * 100)?.toFixed(1)}% du
-            total
+            {((hangarEnActivite?.total_hangars - hangarEnActivite?.hangars_avec_collecteur) / hangarEnActivite?.total_hangars * 100)?.toFixed(1)}% du total
           </p>
         </CardContent>
       </Card>

@@ -37,7 +37,7 @@ export function HangarActiveChart() {
       try {
         const response = await fetchData(
           "get",
-          `cafe/hangars/get_active_and_non_active_sdl/`,
+          `hangar_with_stats/`,
           {
             params: {},
             additionalHeaders: {},
@@ -47,12 +47,12 @@ export function HangarActiveChart() {
         const chartData = [
           {
             status: "Actif",
-            count: response?.achat_cafes_sdl,
+            count: response?.hangars_avec_collecteur,
             fill: "var(--color-actif)",
           },
           {
             status: "Non Actif",
-            count: response?.inactive_sdl,
+            count: response?.total_hangars - response?.hangars_avec_collecteur,
             fill: "var(--color-inactif)",
           },
         ];

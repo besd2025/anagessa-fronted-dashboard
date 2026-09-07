@@ -53,7 +53,7 @@ export function AgeChart() {
       try {
         const response = await fetchData(
           "get",
-          `/mais/hangars/repartition_par_age/`,
+          `cultivators/repartition_par_age/`,
           {
             params: {},
             additionalHeaders: {},
@@ -68,16 +68,16 @@ export function AgeChart() {
             item?.tranche_age === "18-25 ans"
               ? "var(--color-age2)"
               : item?.tranche_age === "26-35 ans"
-              ? "var(--color-age3)"
-              : item?.tranche_age === "36-45 ans"
-              ? "var(--color-age4)"
-              : item?.tranche_age === "46-60 ans"
-              ? "var(--color-age5)"
-              : item?.tranche_age === "60+ ans"
-              ? "var(--color-age6)"
-              : item?.tranche_age === "Moins de 18 ans"
-              ? "var(--color-age1)"
-              : "var(--color-age1)",
+                ? "var(--color-age3)"
+                : item?.tranche_age === "36-45 ans"
+                  ? "var(--color-age4)"
+                  : item?.tranche_age === "46-60 ans"
+                    ? "var(--color-age5)"
+                    : item?.tranche_age === "60+ ans"
+                      ? "var(--color-age6)"
+                      : item?.tranche_age === "Moins de 18 ans"
+                        ? "var(--color-age1)"
+                        : "var(--color-age1)",
         }));
         setData(chartData);
       } catch (error) {

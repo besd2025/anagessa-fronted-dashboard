@@ -73,7 +73,39 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
   const [LoadingEportBtn, setLoadingEportBtn] = useState(false);
   const [ActivedownloadBtn, setActivedownloadBtn] = useState(false);
   const [exportBlob, setExportBlob] = useState(null);
+  const [ActiveSdlValidationBtn, setActiveSdlValidationBtn] = useState(false);
+  const [isSdlExportPending, setIsSdlExportPending] = useState(false);
+  const [LoadingSdlValidationBtn, setLoadingSdlValidationBtn] = useState(false);
+  const exportSdlValidationToExcel = async () => {
+    setIsSdlExportPending(true);
+    setLoadingSdlValidationBtn(true);
+    try {
+      // Export asynchrone identique à anagessa_dashboard/hangar_list.jsx
+      const initial_export = await fetchData("post", "/hangars/export_excel/", {
+        params: {},
+        additionalHeaders: {},
+        body: {},
+      });
 
+      if (initial_export.status == 202) {
+        setLoadingEportBtn(true);
+        const task_id = initial_export?.data?.task_id;
+        const intervalId = setInterval(async () => {
+          const export_excel = await fetchData("get", "/hangars/check_task/", {
+            params: { task_id: task_id },
+          });
+          if (export_excel.status === "done") {
+            clearInterval(intervalId);
+            setLoadingEportBtn(false);
+            setActivedownloadBtn(true);
+          }
+        }, 2000);
+      }
+    } catch (error) {
+      setLoadingEportBtn(false);
+      console.error("Erreur lors de l'exportation:", error);
+    }
+  };
   useEffect(() => {
     const getSdls = async () => {
       setLoading(true);
@@ -161,10 +193,10 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
   const handleSearch = (e) => {
     setSearch(e.target.value);
   };
-  const handleExportSDLs = async () => {
+
+  const ExportHangarsToExcel = async () => {
     setLoadingEportBtn(true);
     try {
-      // Export asynchrone identique à anagessa_dashboard/hangar_list.jsx
       const initial_export = await fetchData("post", "/hangars/export_excel/", {
         params: {},
         additionalHeaders: {},
@@ -179,25 +211,27 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
             params: { task_id: task_id },
           });
           if (export_excel.status === "done") {
-            clearInterval(intervalId);
+            clearInterval(intervalId); // Arrêtez l'intervalle
             setLoadingEportBtn(false);
             setActivedownloadBtn(true);
           }
         }, 2000);
       }
+
+      // Vérifier toutes les 6 secondes
     } catch (error) {
       console.error("Erreur exportation Excel :", error);
     } finally {
-      // Le loading reste actif pendant le polling
+      //setLoadingEportBtn(false);
     }
   };
-
-  const DownloadSDLsToExcel = async () => {
+  const DownloadHangarsToExcel = async () => {
     try {
       const response = await fetchData("get", "/hangars/download_excel/", {
         isBlob: true,
       });
 
+      // Créer le blob avec le bon type MIME
       const blob = new Blob([response.data], {
         type:
           response.headers["content-type"] ||
@@ -211,27 +245,41 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
       const hours = String(now.getHours()).padStart(2, "0");
       const minutes = String(now.getMinutes()).padStart(2, "0");
       const seconds = String(now.getSeconds()).padStart(2, "0");
+
       const timestamp = `${day}_${month}_${year}_${hours}_${minutes}_${seconds}`;
+      // Nom du fichier par défaut
       let filename = `hangars_list_${timestamp}.xlsx`;
+
       const contentDisposition = response.headers["content-disposition"];
       if (contentDisposition) {
         const match = contentDisposition.match(/filename="?(.+)"?/);
         if (match && match[1]) filename = match[1];
       }
+
+      // Création du <a> temporaire
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", filename);
       document.body.appendChild(link);
       link.click();
+
+      // Nettoyage
       link.remove();
       window.URL.revokeObjectURL(url);
+
       setActivedownloadBtn(false);
     } catch (error) {
-      console.error("Erreur lors du téléchargement Excel :", error);
+      console.error("Erreur lors de l'exportation Excel :", error);
     } finally {
-      setLoadingEportBtn(false);
+      setActivedownloadBtn(false);
     }
   };
+
+
+
+
+
+
   const DownloadSdlValidationToExcel = async () => {
     try {
       const response = await fetchData("get", "cafe/cafe_payments/download_payment_validation_export/", {
@@ -382,23 +430,7 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
         );
       },
     },
-    {
-      accessorKey: "society",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Société
-            <ArrowUpDownIcon />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div className="font-medium">{row.getValue("society")}</div>
-      ),
-    },
+
     {
       id: "localite",
       header: "Localité",
@@ -474,11 +506,11 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
             <div className="flex items-center gap-3 text-gray-700">
 
               <ExportButton
-                handleExportSDLs={handleExportSDLs}
+                handleExportSDLs={ExportHangarsToExcel}
                 exportType="sdl_data"
                 loading={LoadingEportBtn}
                 activedownloadBtn={ActivedownloadBtn}
-                onClickDownloadButton={DownloadSDLsToExcel}
+                onClickDownloadButton={DownloadHangarsToExcel}
               />
             </div>
             <div className="hidden lg:flex items-center gap-3">

@@ -25,7 +25,7 @@ export function LoginForm({ className, ...props }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = localStorage.getItem("AccessToken");
     if (accessToken) {
       const user = DecodeToJwt(accessToken);
       const now = new Date();
@@ -40,7 +40,7 @@ export function LoginForm({ className, ...props }) {
           router.push("/anagessa-dashboard/home");
         }
       } else {
-        localStorage.removeItem("accessToken");
+        localStorage.removeItem("AccessToken");
         router.push("/");
       }
     } else {
@@ -94,8 +94,8 @@ export function LoginForm({ className, ...props }) {
       }
       setLoading(true);
       const data = await response.json();
-      document.cookie = `accessToken=${data.access}; path=/; max-age=3600; secure`;
-      localStorage.setItem("accessToken", data.access);
+      document.cookie = `AccessToken=${data.access}; path=/; max-age=3600; secure`;
+      localStorage.setItem("AccessToken", data.access);
       const user = DecodeToJwt(data.access);
       if (
         user?.category === "Admin" ||

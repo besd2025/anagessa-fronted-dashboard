@@ -33,27 +33,7 @@ function StatsCard({ cult_id }) {
           additionalHeaders: {},
           body: {},
         });
-        const valuesdata = await fetchData(
-          "get",
-          `/cultivators/${cult_id}/get_mais_cultivateur_quantite_montant/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          }
-        );
-        const datacavance = await fetchData(
-          "get",
-          `/cultivators/${cult_id}/get_montan_total_avance_cultivateur/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          }
-        );
         setData(response);
-        setValues(valuesdata);
-        setDataavance(datacavance);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {
@@ -74,9 +54,9 @@ function StatsCard({ cult_id }) {
     );
   }
 
-  const total_grains = values?.grains_a + values?.grains_b;
-  const percentageA = total_grains > 0 ? (values?.grains_a / total_grains) * 100 : 0;
-  const percentageB = total_grains > 0 ? (values?.grains_b / total_grains) * 100 : 0;
+  const total_grains = data?.total_quantite;
+  const percentageA = total_grains > 0 ? (data?.total_blanc / total_grains) * 100 : 0;
+  const percentageB = total_grains > 0 ? (data?.total_jaune / total_grains) * 100 : 0;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
@@ -87,10 +67,10 @@ function StatsCard({ cult_id }) {
               <Archive className="text-white" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
-              {values?.grains_a + values?.grains_b >= 1000 ? (
+              {data?.total_quantite >= 1000 ? (
                 <>
                   {(
-                    (values?.grains_a + values?.grains_b) /
+                    data?.total_quantite /
                     1000
                   ).toLocaleString("fr-FR", {
                     minimumFractionDigits: 2,
@@ -100,16 +80,16 @@ function StatsCard({ cult_id }) {
                 </>
               ) : (
                 <>
-                  {(values?.grains_a + values?.grains_b)?.toLocaleString(
+                  {data?.total_quantite?.toLocaleString(
                     "fr-FR"
                   ) || 0}{" "}
                   <span className="text-base">Kg</span>
                 </>
               )}{" "}
             </CardTitle>
-            {((values?.grains_a + values?.grains_b >= 1000) && (user?.session?.category === "Anagessa_Chef_societe" || user?.session?.category === "Superviseur_Regional") ? (
+            {((data?.total_quantite >= 1000) && (user?.session?.category === "Anagessa_Chef_societe" || user?.session?.category === "Superviseur_Regional") ? (
               <span className="text-sm font-normal text-muted-foreground ml-2">
-                ({(values?.grains_a + values?.grains_b)?.toLocaleString("fr-FR")} kg)
+                ({(data?.total_quantite)?.toLocaleString("fr-FR")} kg)
               </span>
             ) : (
               <></>
@@ -150,9 +130,9 @@ function StatsCard({ cult_id }) {
                   </CardTitle>
                 </div>
                 <CardDescription className="font-semibold text-accent-foreground text-lg">
-                  {values?.grains_a >= 1000 ? (
+                  {data?.total_blanc >= 1000 ? (
                     <>
-                      {(values?.grains_a / 1000).toLocaleString("fr-FR", {
+                      {(data?.total_blanc / 1000).toLocaleString("fr-FR", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
@@ -160,13 +140,13 @@ function StatsCard({ cult_id }) {
                     </>
                   ) : (
                     <>
-                      {values?.grains_a?.toLocaleString("fr-FR") || 0}{" "}
+                      {data?.total_blanc?.toLocaleString("fr-FR") || 0}{" "}
                       <span className="text-sm">Kg</span>
                     </>
                   )}{" "}
                   {(user?.session?.category === "Anagessa_Chef_societe" || user?.session?.category === "Superviseur_Regional") ? (
                     <span className="text-xs font-normal text-muted-foreground ml-2">
-                      ({values?.grains_a?.toLocaleString("fr-FR")} kg)
+                      ({data?.total_blanc?.toLocaleString("fr-FR")} kg)
                     </span>
                   ) : (
                     <span className="text-xs font-normal text-muted-foreground ml-2">
@@ -189,9 +169,9 @@ function StatsCard({ cult_id }) {
                   </CardTitle>
                 </div>
                 <CardDescription className="font-semibold text-accent-foreground text-lg">
-                  {values?.grains_b >= 1000 ? (
+                  {data?.total_jaune >= 1000 ? (
                     <>
-                      {(values?.grains_b / 1000).toLocaleString("fr-FR", {
+                      {(data?.total_jaune / 1000).toLocaleString("fr-FR", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
@@ -199,7 +179,7 @@ function StatsCard({ cult_id }) {
                     </>
                   ) : (
                     <>
-                      {values?.grains_b?.toLocaleString("fr-FR") || 0}{" "}
+                      {data?.total_jaune?.toLocaleString("fr-FR") || 0}{" "}
                       <span className="text-sm">Kg</span>
                     </>
                   )}{" "}
@@ -207,7 +187,7 @@ function StatsCard({ cult_id }) {
                   {(user?.session?.category == "Anagessa_Chef_societe" || user?.session?.category == "Superviseur_Regional"
                   ) ? (
                     <span className="text-xs font-normal text-muted-foreground ml-2">
-                      ({values?.grains_b?.toLocaleString("fr-FR")} kg)
+                      ({data?.total_jaune?.toLocaleString("fr-FR")} kg)
                     </span>
                   ) : (
                     <span className="text-xs font-normal text-muted-foreground ml-2">
@@ -232,7 +212,7 @@ function StatsCard({ cult_id }) {
             </CardTitle>
           </div>
           <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
-            {(values?.montant_grains_a + values?.montant_grains_b ?? 0)
+            {((data?.total_quantite || 0) * 1700 ?? 0)
               .toString()
               .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}{" "}
             <span className="text-base">FBU</span>
@@ -252,7 +232,7 @@ function StatsCard({ cult_id }) {
               </CardTitle>
             </div>
             <Separator />
-            <div className="flex flex-row gap-x-4 items-center">
+            {/* <div className="flex flex-row gap-x-4 items-center">
               <div className="flex flex-row gap-x-1 items-center">
                 <Banknote className="text-secondary" />
 
@@ -263,7 +243,7 @@ function StatsCard({ cult_id }) {
               <CardTitle className="text-md font-semibold tracking-tight tabular-nums">
                 {dataavance?.montant_total?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} <span className="text-base">FBU</span>
               </CardTitle>
-            </div>
+            </div> */}
           </div>
         </CardHeader>
       </Card>
@@ -291,7 +271,7 @@ function StatsCard({ cult_id }) {
                     No compte
                   </div>
                   <div className="text-lg font-semibold tracking-tight tabular-nums">
-                    {data?.cultivator_mobile_payment_account}
+                    {data?.cultivator_bank_account}
                   </div>
                 </div>
                 <div className="flex flex-col">

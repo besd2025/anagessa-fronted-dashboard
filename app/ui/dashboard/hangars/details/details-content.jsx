@@ -96,7 +96,8 @@ function DetailsContent({ id }) {
           },
         },
       );
-      const results = response?.results || [];
+      const results = response?.results?.items || [];
+      console.log("results achats", results);
       const formatData = (achats) => ({
         id: achats?.id,
         in_payment: achats?.in_payment,
@@ -109,15 +110,16 @@ function DetailsContent({ id }) {
           cultivator_type: "individual",
         },
         localite: {
-          province: achats?.cultivator?.province || achats?.province || "N/A",
-          commune: achats?.cultivator?.commune || achats?.commune || "N/A",
+          province: achats?.cultivator?.cultivateur_adress?.zone_code?.commune_code?.province_code?.province_name,
+          commune: achats?.cultivator?.cultivateur_adress?.zone_code?.commune_code?.commune_name,
+          zone: achats?.cultivator?.cultivateur_adress?.zone_code?.zone_name,
         },
-        num_fiche: achats?.numero_fiche || "0",
-        num_recu: achats?.numero_recu || "N/A",
-        photo_fiche: achats?.photo_fiche,
-        ca: achats?.quantity_blanc || achats?.quantite_blanc || 0,
-        cb: achats?.quantity_jaune || achats?.quantite_jaune || 0,
+        num_recu: achats?.receipt_number || "N/A",
+        photo_recu: achats?.receipt_photo,
+        blanc: achats?.quantity_blanc || achats?.quantite_blanc || 0,
+        jaune: achats?.quantity_jaune || achats?.quantite_jaune || 0,
         date: achats?.date_achat,
+        date_creation: achats?.created_at,
       });
 
       const formattedResults = results?.map(formatData) || [];
@@ -133,12 +135,13 @@ function DetailsContent({ id }) {
     try {
       const response = await fetchData(
         "get",
-        `hangars/${id}/cultivateurs_list/`,
+        `hangars/${id}/cultivateurs/`,
         {
           params: { limit: limit, offset: pointer },
         },
       );
       const results = response?.results || [];
+      console.log("results", results);
       const cultivatorsData = results?.map((cultivator) => ({
         id: cultivator?.id,
         cultivator: {
@@ -150,12 +153,12 @@ function DetailsContent({ id }) {
         },
         in_payment: cultivator?.in_payment,
         cni: cultivator?.cni || cultivator?.cultivator_cni,
-        cni_image_url: cultivator?.cni_photo || cultivator?.cultivator_cni_photo,
+        cni_image_url: cultivator?.cultivator_cni_photo,
         localite: {
-          province: cultivator?.province || "N/A",
-          commune: cultivator?.commune || "N/A",
+          province: cultivator?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name,
+          commune: cultivator?.cultivator_adress?.zone_code?.commune_code?.commune_name,
+          zone: cultivator?.cultivator_adress?.zone_code?.zone_name,
         },
-        champs: cultivator?.nombre_champs || 1,
       }));
       setIndividualCultivatorsData(cultivatorsData);
       setTotalCount(response?.count || 0);

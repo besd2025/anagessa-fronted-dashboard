@@ -275,11 +275,6 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
     }
   };
 
-
-
-
-
-
   const DownloadSdlValidationToExcel = async () => {
     try {
       const response = await fetchData("get", "cafe/cafe_payments/download_payment_validation_export/", {
@@ -331,10 +326,6 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
       setLoadingEportBtn(false);
     }
   };
-
-
-
-
   const columns = [
     {
       id: "actions",
@@ -361,7 +352,7 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
                 Copier code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link href={`/odeca-dashboard/hangars/details/?id=${hangar?.id}`}>
+              <Link href={`/anagessa-dashboard/hangars/details/?id=${hangar?.id}`}>
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
               {user?.session?.category === "Admin" ? (<div>

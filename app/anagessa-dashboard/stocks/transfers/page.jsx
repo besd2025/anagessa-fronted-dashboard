@@ -23,28 +23,30 @@ export default function TransfersPage() {
     const fetchDataForActiveTab = async () => {
       try {
         setLoading(true);
-        const response_ct_sdl = await fetchData("get", "/transfert/", {
+        const response_ct_sdl = await fetchData("get", "transfert", {
           params: { limit: limit, offset: pointer, search: searchvalue },
         });
         const results2 = response_ct_sdl?.results || [];
         const mappedCtTransfers = results2.map((transfer) => ({
           id: transfer.id,
-          transfer_sdl_ct_code: transfer?.code_transfert || `TR-${transfer.id}`,
-          from_ct: transfer?.from_hangar?.hangar_name || transfer?.collector?.hangar?.hangar_name || "Hangar Source",
-          to_depulpeur_name: transfer?.to_hangar?.hangar_name || "Hangar Destination",
-          date: transfer?.transfer_date || transfer?.date_transfert,
-          status: transfer?.est_valide ?? transfer?.est_confirme,
+          transfer_code: transfer?.code_transfert || `TR-${transfer.id}`,
+          from: transfer?.from_hangar?.hangar_name,
+          to: transfer?.to_hangar?.hangar_name,
+          date: transfer?.transfer_date,
+          status: transfer?.is_confirmed,
           qte_tranferer: {
-            ca: transfer?.quantity_blanc || transfer?.quantite_blanc || 0,
-            cb: transfer?.quantity_jaune || transfer?.quantite_jaune || 0,
+            ca: transfer?.quantity_blanc,
+            cb: transfer?.quantity_jaune,
           },
-          photo_fiche: transfer?.photo_bordereau || transfer?.photo_fiche,
-          chauffeur: transfer?.chauffeur || transfer?.driver_name,
-          accompagnateur: transfer?.accompagnateur,
+          quantity: transfer?.quantity_blanc + transfer?.quantity_jaune,
+          photo_fiche: transfer?.transfer_receipt,
+          chauffeur: transfer?.chauffeur_nom + " " + transfer?.chauffeur_prenom,
+          accompagnateur: transfer?.accompagnateur_nom + " " + transfer?.accompagnateur_prenom,
           localite: {
-            province: transfer?.from_hangar?.province || "N/A",
-            commune: transfer?.from_hangar?.commune || "N/A",
+            province: transfer?.from_hangar?.province,
+            commune: transfer?.from_hangar?.commune,
           },
+          created_at: transfer?.created_at,
         }));
         setCtTransfers(mappedCtTransfers);
         setTotalCount(response_ct_sdl?.count || 0);

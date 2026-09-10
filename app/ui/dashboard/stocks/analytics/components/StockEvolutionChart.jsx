@@ -76,20 +76,20 @@ export function StockEvolutionChart() {
               : period === "annee"
                 ? "year"
                 : "month";
-        console.log("Fetching data for period:", periodParam);
         const results = await fetchData(
           "get",
-          `/mais/hangars/get_recent_total_7_cultivators_per_days_or_weeks_or_months_for_line_chart?period=${periodParam}`,
+          `/stock_evolution/?period=${periodParam}`,
           { params: {}, additionalHeaders: {}, body: {} }
         );
+        console.log("Fetching data for period:", results);
 
         if (!Array.isArray(results)) return;
 
         const chartData = results.map((item) => ({
           date: item.period,
-          amount: item.quantite_total || 0,
-          ca: item.quantite_grains_a || 0,
-          cb: item.quantite_grains_b || 0,
+          amount: item.stock || 0,
+          blanc: item.blanc || 0,
+          jaune: item.jaune || 0,
         }));
         setDataByPeriod((prev) => ({
           ...prev,
@@ -125,7 +125,9 @@ export function StockEvolutionChart() {
           onValueChange={handleTimePeriodChange}
           className="w-full lg:w-[200px]"
         >
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="jour">Jour</TabsTrigger>
+            <TabsTrigger value="semaine">Semaine</TabsTrigger>
             <TabsTrigger value="mois">Mois</TabsTrigger>
             <TabsTrigger value="annee">Année</TabsTrigger>
           </TabsList>
@@ -198,14 +200,14 @@ export function StockEvolutionChart() {
               stroke="var(--color-amount)"
             />
             <Area
-              dataKey="ca"
+              dataKey="blanc"
               type="natural"
               fill="url(#fillStockCA)"
               fillOpacity={0.4}
               stroke="var(--color-ca)"
             />
             <Area
-              dataKey="cb"
+              dataKey="jaune"
               type="natural"
               fill="url(#fillStockCB)"
               fillOpacity={0.4}

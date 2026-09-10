@@ -56,7 +56,6 @@ export default function TransferSdlDep({
   const [rowSelection, setRowSelection] = React.useState({});
   const [searchValue, setSearchValue] = useState("");
   const user = React.useContext(UserContext);
-
   // Details Modal state
   const [selectedTransfer, setSelectedTransfer] = useState(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -129,8 +128,8 @@ export default function TransferSdlDep({
       },
     },
     {
-      id: "sdl_source",
-      accessorFn: (row) => row.from_sdl || row.hangar?.sdl_nom || "-",
+      id: "from",
+      accessorFn: (row) => row.from || "-",
       header: ({ column }) => (
         <Button
           variant="ghost"
@@ -143,31 +142,49 @@ export default function TransferSdlDep({
       ),
       cell: ({ row }) => (
         <div className="font-semibold text-foreground">
-          {row.getValue("sdl_source")}
+          {row.getValue("from")}
         </div>
       ),
     },
     {
-      id: "usine_deparchage",
+      id: "to",
       accessorFn: (row) =>
-        row.usine_deparchage?.usine_name ||
-        row.usine_deparchage ||
-        row.usine?.name ||
-        row.usine ||
-        "-",
+        row.to,
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
 
         >
-          Usine de Déparchage
+          Hangar Destinantion
           <ArrowUpDownIcon className="ml-1 h-3 w-3" />
         </Button>
       ),
       cell: ({ row }) => (
         <div className="font-medium text-foreground">
-          {row.getValue("usine_deparchage")}
+          {row.getValue("to")}
+        </div>
+      ),
+    },
+    {
+      id: "quantity",
+      accessorFn: (row) =>
+        row.quantity,
+      header: ({ column }) => (
+        <div className="text-center">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+
+          >
+            Qte Transfert
+            <ArrowUpDownIcon className="ml-1 h-3 w-3" />
+          </Button>
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="text-center font-medium text-foreground text-sm">
+          {row.getValue("quantity")}
         </div>
       ),
     },
@@ -194,13 +211,9 @@ export default function TransferSdlDep({
       ),
     },
     {
-      id: "enregitrement_date",
+      id: "created_at",
       accessorFn: (row) =>
-        row.enregitrement_date ||
-        row.date_enregistrement ||
-        row.enregistrement_date ||
-        row.created_at ||
-        "-",
+        row.created_at,
       header: ({ column }) => (
         <div className="text-center">
           <Button
@@ -215,7 +228,16 @@ export default function TransferSdlDep({
       ),
       cell: ({ row }) => (
         <div className="text-center text-xs text-muted-foreground font-medium">
-          {row.getValue("enregitrement_date")}
+          {new Date(row.getValue("created_at")).toLocaleString("fr-FR",
+            {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            }
+          )}
         </div>
       ),
     },
@@ -245,16 +267,10 @@ export default function TransferSdlDep({
       id: "status",
       header: () => <div >Statut</div>,
       cell: ({ row }) => {
-        const isConfirmed =
-          row.original.est_confirme === true ||
-          row.original.status === true ||
-          row.original.status === "CONFIRME" ||
-          row.original.status === "CONFIRMEE" ||
-          row.original.comfirmation_status === "CONFIRMEE";
-
+        const status = row.original.status;
         return (
           <div className="flex justify-center">
-            {isConfirmed ? (
+            {status == true ? (
               <Badge variant="secondary" className="gap-1">
                 <CheckCircle2 className="h-3 w-3" />
                 Confirmé

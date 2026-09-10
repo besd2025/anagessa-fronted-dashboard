@@ -19,7 +19,6 @@ export default function AchatsListTable({
   onExportAssociationToExcel,
 }) {
   const [tabValue, setTabValue] = React.useState("individual");
-
   const handleChange = (value) => {
     setTabValue(value);
     // Mode hangar : notifier le parent pour fetcher le bon type

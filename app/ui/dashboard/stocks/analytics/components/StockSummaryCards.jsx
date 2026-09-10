@@ -20,25 +20,25 @@ export function StockSummaryCards() {
       try {
         const response = await fetchData(
           "get",
-          `/mais/achat_mais/get_total_achat/`,
+          `/stock_resume/`,
           {
             params: {},
             additionalHeaders: {},
             body: {},
           }
         );
-
-        const rendement = await fetchData(
-          "get",
-          `/mais/rendements/get_rendement_lot/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          }
-        );
+        console.log("data: ", response);
+        // const rendement = await fetchData(
+        //   "get",
+        //   `/mais/rendements/get_rendement_lot/`,
+        //   {
+        //     params: {},
+        //     additionalHeaders: {},
+        //     body: {},
+        //   }
+        // );
         setData(response);
-        setRendement(rendement);
+        //setRendement(rendement);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
       } finally {
@@ -68,9 +68,9 @@ export function StockSummaryCards() {
               <Package className="h-4 w-4" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums ml-2">
-              {data?.total_grains_achat >= 1000 ? (
+              {data?.stock?.total >= 1000 ? (
                 <>
-                  {(data?.total_grains_achat / 1000).toLocaleString("fr-FR", {
+                  {(data?.stock?.total / 1000).toLocaleString("fr-FR", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}{" "}
@@ -78,7 +78,7 @@ export function StockSummaryCards() {
                 </>
               ) : (
                 <>
-                  {data?.total_grains_achat?.toLocaleString("fr-FR") || 0}{" "}
+                  {data?.stock?.total?.toLocaleString("fr-FR") || 0}{" "}
                   <span className="text-sm">Kg</span>
                 </>
               )}
@@ -100,9 +100,9 @@ export function StockSummaryCards() {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {data?.total_grains_a_achat >= 1000 ? (
+                {data?.stock?.blanc >= 1000 ? (
                   <>
-                    {(data?.total_grains_a_achat / 1000).toLocaleString(
+                    {(data?.stock?.blanc / 1000).toLocaleString(
                       "fr-FR",
                       {
                         minimumFractionDigits: 2,
@@ -113,7 +113,7 @@ export function StockSummaryCards() {
                   </>
                 ) : (
                   <>
-                    {data?.total_grains_a_achat?.toLocaleString("fr-FR") || 0}{" "}
+                    {data?.stock?.blanc?.toLocaleString("fr-FR") || 0}{" "}
                     <span className="text-sm">Kg</span>
                   </>
                 )}
@@ -127,9 +127,9 @@ export function StockSummaryCards() {
                 </CardTitle>
               </div>
               <CardDescription className="font-semibold text-accent-foreground text-lg">
-                {data?.total_grains_b_achat >= 1000 ? (
+                {data?.stock?.jaune >= 1000 ? (
                   <>
-                    {(data?.total_grains_b_achat / 1000).toLocaleString(
+                    {(data?.stock?.jaune / 1000).toLocaleString(
                       "fr-FR",
                       {
                         minimumFractionDigits: 2,
@@ -140,7 +140,7 @@ export function StockSummaryCards() {
                   </>
                 ) : (
                   <>
-                    {data?.total_grains_b_achat?.toLocaleString("fr-FR") || 0}{" "}
+                    {data?.stock?.jaune?.toLocaleString("fr-FR") || 0}{" "}
                     <span className="text-sm">Kg</span>
                   </>
                 )}

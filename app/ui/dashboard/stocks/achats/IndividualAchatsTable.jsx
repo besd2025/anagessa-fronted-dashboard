@@ -123,23 +123,13 @@ export default function IndividualAchatsTable({
             zone: achat?.collector?.hangar?.zone || achat?.zone || "N/A",
           },
           in_payment: achat?.in_payment,
-          num_fiche: achat?.numero_fiche || "0",
-          num_recu: achat?.numero_recu || "N/A",
-          num_page: achat?.numero_page || "N/A",
-          photo_fiche: achat?.photo_fiche,
-          ca: achat?.quantity_blanc || achat?.quantite_blanc || 0,
-          cb: achat?.quantity_jaune || achat?.quantite_jaune || 0,
+          num_recu: achat?.receipt_number || "N/A",
+          photo_recu: achat?.receipt_photo,
+          blanc: achat?.quantity_blanc || achat?.quantite_blanc || 0,
+          jaune: achat?.quantity_jaune || achat?.quantite_jaune || 0,
           date: achat?.date_achat || "N/A",
           date_creation: achat?.created_at
-            ? new Date(achat.created_at).toLocaleString('fr-FR', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
-            })
-            : null
+
         }));
         setData(formattedData || []);
         setTotalCount(response?.count || 0);
@@ -381,25 +371,6 @@ export default function IndividualAchatsTable({
             },
             cell: ({ row }) => <div>{row.getValue("sdl_ct")}</div>,
           },
-          {
-            accessorKey: "society",
-            header: ({ column }) => {
-              return (
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === "asc")
-                  }
-                >
-                  Société
-                  <ArrowUpDownIcon />
-                </Button>
-              );
-            },
-            cell: ({ row }) => (
-              <div className="font-medium">{row.getValue("society")}</div>
-            ),
-          },
         ]
         : []),
       {
@@ -415,15 +386,6 @@ export default function IndividualAchatsTable({
         },
       },
       {
-        accessorKey: "num_fiche",
-        header: "No Fiche",
-        cell: ({ row }) => (
-          <div className="text-center font-semibold">
-            {row.getValue("num_fiche")}
-          </div>
-        ),
-      },
-      {
         accessorKey: "num_recu",
         header: "No Recus",
         cell: ({ row }) => (
@@ -433,7 +395,7 @@ export default function IndividualAchatsTable({
         ),
       },
       {
-        accessorKey: "ca",
+        accessorKey: "blanc",
         header: ({ column }) => {
           return (
             <Button
@@ -442,17 +404,17 @@ export default function IndividualAchatsTable({
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
             >
-              CA
+              Maïs Blanc
               <ArrowUpDownIcon />
             </Button>
           );
         },
         cell: ({ row }) => (
-          <div className="text-center font-semibold">{row.getValue("ca")}</div>
+          <div className="text-center font-semibold">{row.getValue("blanc")}</div>
         ),
       },
       {
-        accessorKey: "cb",
+        accessorKey: "jaune",
         header: ({ column }) => {
           return (
             <Button
@@ -461,23 +423,23 @@ export default function IndividualAchatsTable({
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
             >
-              CB
+              Maïs Jaune
               <ArrowUpDownIcon />
             </Button>
           );
         },
         cell: ({ row }) => (
-          <div className="text-center font-semibold">{row.getValue("cb")}</div>
+          <div className="text-center font-semibold">{row.getValue("jaune")}</div>
         ),
       },
       {
-        accessorKey: "photo_fiche",
-        header: "Fiche",
+        accessorKey: "photo_recu",
+        header: "Reçu",
         cell: ({ row }) => (
           <div className="text-center font-semibold">
             <ViewImageDialog
-              imageUrl={row.getValue("photo_fiche")}
-              alt={`photo_fiche`}
+              imageUrl={row.getValue("photo_recu")}
+              alt={`photo_recu`}
               profile={false}
             />
           </div>
@@ -497,7 +459,14 @@ export default function IndividualAchatsTable({
         header: "Date Creation",
         cell: ({ row }) => (
           <div className="text-center font-semibold">
-            {row.getValue("date_creation")}
+            {new Date(row.getValue("date_creation"))?.toLocaleString('fr-FR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            })}
           </div>
         ),
       },

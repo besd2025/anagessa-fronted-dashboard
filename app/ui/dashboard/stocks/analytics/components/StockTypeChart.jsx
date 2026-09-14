@@ -29,19 +29,19 @@ const chartConfig = {
     label: "Quantité (T)",
   },
   gradeA1: {
-    label: "MaÃ¯s blanc",
+    label: "Maïs blanc",
     color: "var(--chart-5)",
   },
   gradeA2: {
-    label: " MaÃ¯s blanc",
+    label: " Maïs blanc",
     color: "var(--chart-4)",
   },
   gradeB1: {
-    label: "MaÃ¯s jaune",
+    label: "Maïs jaune",
     color: "var(--chart-3)",
   },
   gradeB2: {
-    label: "MaÃ¯s jaune",
+    label: "Maïs jaune",
     color: "var(--chart-2)",
   },
 };
@@ -59,23 +59,25 @@ export function StockTypeChart() {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
 
-        const chatData = (Array.isArray(response) ? response : []).map((item) => ({
-          grade: item?.grade__grade_name,
-          amount: item?.total_grains,
-          fill:
-            item?.grade === "A1"
-              ? "var(--color-gradeA1)"
-              : item?.grade === "A2"
-              ? "var(--color-gradeA2)"
-              : item?.grade === "B1"
-              ? "var(--color-gradeB1)"
-              : item?.grade === "B2"
-              ? "var(--color-gradeB2)"
-              : "var(--color-gradeA2)",
-        }));
+        const chatData = (Array.isArray(response) ? response : []).map(
+          (item) => ({
+            grade: item?.grade__grade_name,
+            amount: item?.total_grains,
+            fill:
+              item?.grade === "A1"
+                ? "var(--color-gradeA1)"
+                : item?.grade === "A2"
+                  ? "var(--color-gradeA2)"
+                  : item?.grade === "B1"
+                    ? "var(--color-gradeB1)"
+                    : item?.grade === "B2"
+                      ? "var(--color-gradeB2)"
+                      : "var(--color-gradeA2)",
+          }),
+        );
         setData(chatData);
         console.log("rendement par grade", chatData);
       } catch (error) {

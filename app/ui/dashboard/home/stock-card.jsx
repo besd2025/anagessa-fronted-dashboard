@@ -10,22 +10,32 @@ import {
 import { Package, DollarSign, Squircle } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { StockCardSkeleton } from "@/components/ui/skeletons";
+import { Separator } from "@/components/ui/separator";
 
 export function StockSummaryCard() {
   const [data, setData] = React.useState({});
   const [prixAchat, setPrixAchat] = React.useState(null);
+  const [stockInitialHZ, setStockInitialHZ] = React.useState({});
+  const [stockInitialHDZ, setStockInitialHDZ] = React.useState({});
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
     const getDatas = async () => {
       setIsLoading(true);
       try {
-        const [stockRes, prixRes] = await Promise.allSettled([
-          fetchData("get", "stock_resume/"),
-          fetchData("get", "admin/prices/get_prix_achat/"),
-        ]);
+        const [stockRes, prixRes, stockInitHZ, stockInitHDZ] =
+          await Promise.allSettled([
+            fetchData("get", "stock_resume/"),
+            fetchData("get", "admin/prices/get_prix_achat/"),
+            fetchData("get", "stock_resume_initial/"),
+            fetchData("get", "stock_resume_initial/?detail=true"),
+          ]);
         if (stockRes.status === "fulfilled") setData(stockRes.value || {});
         if (prixRes.status === "fulfilled") setPrixAchat(prixRes.value || {});
+        if (stockInitHZ.status === "fulfilled")
+          setStockInitialHZ(stockInitHZ.value || {});
+        if (stockInitHDZ.status === "fulfilled")
+          setStockInitialHDZ(stockInitHDZ.value || {});
       } catch (error) {
         console.error("Error fetching stock summary data:", error);
       } finally {
@@ -45,9 +55,43 @@ export function StockSummaryCard() {
   const totalStock = stockBlanc + stockJaune;
   const unitPrice = prixAchat?.prix_achat || 0;
   const montantEstime = totalStock * unitPrice;
+  const totalStockInit =
+    (stockInitialHZ?.total || 0) + (stockInitialHDZ?.total || 0);
 
   return (
     <Card className="@container/stock h-full shadow-xs">
+      <CardHeader className="flex flex-col">
+        <div className="flex flex-row gap-x-3 items-center">
+          <div className="bg-destructive p-2.5 rounded-xl shadow-xs text-white">
+            <Package className="h-5 w-5" />
+          </div>
+          <div>
+            <CardDescription className="text-lg font-semibold">
+              Stock Initial
+              <span className="text-xs font-normal text-muted-foreground normal-case block">
+                (Avant Campagne)
+              </span>
+            </CardDescription>
+            <CardTitle className="text-2xl @[250px]/card:text-3xl font-bold tracking-tight  tabular-nums">
+              {totalStockInit >= 1000 ? (
+                <>
+                  {(totalStockInit / 1000).toLocaleString("fr-FR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                  <span className="text-base font-normal">T</span>
+                </>
+              ) : (
+                <>
+                  {totalStockInit.toLocaleString("fr-FR")}{" "}
+                  <span className="text-sm font-normal">Kg</span>
+                </>
+              )}
+            </CardTitle>
+          </div>
+        </div>
+      </CardHeader>
+      <Separator />
       <CardHeader>
         <div className="flex flex-row gap-x-2 items-center">
           <div className="bg-primary p-2 rounded-lg text-white">

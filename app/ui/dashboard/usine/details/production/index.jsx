@@ -36,28 +36,28 @@ export default function Production({ data = [] }) {
     () => [
       {
         id: 1,
-        grade: "MaÃ¯s blanc",
+        grade: "Maïs blanc",
         proprietaire: "Coopérative KAWA",
         lot: "LOT-24-001",
         quantite: 2500,
       },
       {
         id: 2,
-        grade: "MaÃ¯s blanc",
+        grade: "Maïs blanc",
         proprietaire: "Coopérative KAWA",
         lot: "LOT-24-001",
         quantite: 1500,
       },
       {
         id: 3,
-        grade: "MaÃ¯s jaune",
+        grade: "Maïs jaune",
         proprietaire: "Coopérative KAWA",
         lot: "LOT-24-001",
         quantite: 500,
       },
       {
         id: 4,
-        grade: "MaÃ¯s blanc",
+        grade: "Maïs blanc",
         proprietaire: "SOGESTAL",
         lot: "LOT-24-002",
         quantite: 1200,
@@ -231,9 +231,9 @@ export default function Production({ data = [] }) {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                     </TableHead>
                   ))}
                 </TableRow>

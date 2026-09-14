@@ -41,7 +41,9 @@ import EditRapport from "./edit_rapport";
 const XLSX = require("xlsx");
 import { saveAs } from "file-saver";
 import { ROLES } from "@/lib/permissions";
-export default function HangarsListTableReports({ isLoading: externalLoading }) {
+export default function HangarsListTableReports({
+  isLoading: externalLoading,
+}) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -55,7 +57,7 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
   });
 
   const isActuallyLoading = externalLoading ?? loading;
-  const user = useContext(UserContext)
+  const user = useContext(UserContext);
   const [pointer, setPointer] = useState(0);
   const [limit, setLimit] = useState(5);
   const [totalCount, setTotalCount] = useState(0);
@@ -70,16 +72,20 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
     const getHangars = async () => {
       setLoading(true);
       try {
-        const response = await fetchData("get", "mais/rapportages_sdl_ct/get_ct_rapport/", {
-          params: {
-            limit: limit,
-            offset: pointer,
-            ...filterData,
-            search: search,
+        const response = await fetchData(
+          "get",
+          "mais/rapportages_sdl_ct/get_ct_rapport/",
+          {
+            params: {
+              limit: limit,
+              offset: pointer,
+              ...filterData,
+              search: search,
+            },
+            additionalHeaders: {},
+            body: {},
           },
-          additionalHeaders: {},
-          body: {},
-        });
+        );
         const results = response?.results;
         const ctData = results.map((hangar) => ({
           id: hangar?.id,
@@ -96,25 +102,55 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
           },
           localite: {
             province:
-              hangar?.sdl_ct?.sdl_ct?.hangar?.ct_adress?.zone_code?.commune_code?.province_code
-                ?.province_name || "",
-            commune: hangar?.sdl_ct?.sdl_ct?.hangar?.ct_adress?.zone_code?.commune_code?.commune_name,
+              hangar?.sdl_ct?.sdl_ct?.hangar?.ct_adress?.zone_code?.commune_code
+                ?.province_code?.province_name || "",
+            commune:
+              hangar?.sdl_ct?.sdl_ct?.hangar?.ct_adress?.zone_code?.commune_code
+                ?.commune_name,
           },
           quantite: {
-            total_collecte: hangar?.quantite_grains_a_from_mobile + hangar?.quantite_grains_b_from_mobile || "",
+            total_collecte:
+              hangar?.quantite_grains_a_from_mobile +
+                hangar?.quantite_grains_b_from_mobile || "",
             total_ca_collecte: hangar?.quantite_grains_a_from_mobile || "",
             total_cb_collecte: hangar?.quantite_grains_b_from_mobile || "",
-            total_rapport: hangar?.quantite_grains_a_rapport + hangar?.quantite_grains_b_rapport || "",
+            total_rapport:
+              hangar?.quantite_grains_a_rapport +
+                hangar?.quantite_grains_b_rapport || "",
             total_ca_rapport: hangar?.quantite_grains_a_rapport || "",
             total_cb_rapport: hangar?.quantite_grains_b_rapport || "",
-            gap_total: (hangar?.quantite_grains_a_from_mobile + hangar?.quantite_grains_b_from_mobile) > (hangar?.quantite_grains_a_rapport + hangar?.quantite_grains_b_rapport) ? (hangar?.quantite_grains_a_from_mobile + hangar?.quantite_grains_b_from_mobile) - (hangar?.quantite_grains_a_rapport + hangar?.quantite_grains_b_rapport) : (hangar?.quantite_grains_a_rapport + hangar?.quantite_grains_b_rapport) - (hangar?.quantite_grains_a_from_mobile + hangar?.quantite_grains_b_from_mobile) || "",
-            total_gap_ca: hangar?.quantite_grains_a_from_mobile > hangar?.quantite_grains_a_rapport ? hangar?.quantite_grains_a_from_mobile - hangar?.quantite_grains_a_rapport : hangar?.quantite_grains_a_rapport - hangar?.quantite_grains_a_from_mobile || "",
-            total_gap_cb: hangar?.quantite_grains_b_from_mobile > hangar?.quantite_grains_b_rapport ? hangar?.quantite_grains_b_from_mobile - hangar?.quantite_grains_b_rapport : hangar?.quantite_grains_b_rapport - hangar?.quantite_grains_b_from_mobile || "",
-          }
+            gap_total:
+              hangar?.quantite_grains_a_from_mobile +
+                hangar?.quantite_grains_b_from_mobile >
+              hangar?.quantite_grains_a_rapport +
+                hangar?.quantite_grains_b_rapport
+                ? hangar?.quantite_grains_a_from_mobile +
+                  hangar?.quantite_grains_b_from_mobile -
+                  (hangar?.quantite_grains_a_rapport +
+                    hangar?.quantite_grains_b_rapport)
+                : hangar?.quantite_grains_a_rapport +
+                    hangar?.quantite_grains_b_rapport -
+                    (hangar?.quantite_grains_a_from_mobile +
+                      hangar?.quantite_grains_b_from_mobile) || "",
+            total_gap_ca:
+              hangar?.quantite_grains_a_from_mobile >
+              hangar?.quantite_grains_a_rapport
+                ? hangar?.quantite_grains_a_from_mobile -
+                  hangar?.quantite_grains_a_rapport
+                : hangar?.quantite_grains_a_rapport -
+                    hangar?.quantite_grains_a_from_mobile || "",
+            total_gap_cb:
+              hangar?.quantite_grains_b_from_mobile >
+              hangar?.quantite_grains_b_rapport
+                ? hangar?.quantite_grains_b_from_mobile -
+                  hangar?.quantite_grains_b_rapport
+                : hangar?.quantite_grains_b_rapport -
+                    hangar?.quantite_grains_b_from_mobile || "",
+          },
         }));
 
         setData(ctData);
-        console.log("ctData :", results)
+        console.log("ctData :", results);
         setTotalCount(response?.count);
       } catch (error) {
         console.error("Error fetching cultivators data:", error);
@@ -152,7 +188,6 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
   };
 
   const exportRapportsCTToExcel = async () => {
-
     setLoadingEportBtn(true);
     try {
       // Étape 1 : Récupérer le nombre total d'enregistrements
@@ -194,10 +229,14 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
   };
   const DownloadRapportsCTToExcel = async () => {
     try {
-      const response = await fetchData("get", "/mais/rapportages_sdl_ct/download_ct_export", {
-        params: { task_id: reportId },
-        isBlob: true,
-      });
+      const response = await fetchData(
+        "get",
+        "/mais/rapportages_sdl_ct/download_ct_export",
+        {
+          params: { task_id: reportId },
+          isBlob: true,
+        },
+      );
       // Créer le blob avec le bon type MIME
       const blob = new Blob([response.data], {
         type:
@@ -243,10 +282,6 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
     }
   };
 
-
-
-
-
   // const handleExportCTs = async () => {
   //   setLoadingEportBtn(true);
   //   try {
@@ -290,8 +325,6 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
   //         TOTAL_GAP_CELISE: (item?.quantite_grains_a_from_mobile + item?.quantite_grains_b_from_mobile) > (item?.quantite_grains_a_rapport + item?.quantite_grains_b_rapport) ? (item?.quantite_grains_a_from_mobile + item?.quantite_grains_b_from_mobile) - (item?.quantite_grains_a_rapport + item?.quantite_grains_b_rapport) : (item?.quantite_grains_a_rapport + item?.quantite_grains_b_rapport) - (item?.quantite_grains_a_from_mobile + item?.quantite_grains_b_from_mobile) || "",
   //         TOTAL_GAP_CA: item?.quantite_grains_a_from_mobile > item?.quantite_grains_a_rapport ? item?.quantite_grains_a_from_mobile - item?.quantite_grains_a_rapport : item?.quantite_grains_a_rapport - item?.quantite_grains_a_from_mobile || "",
   //         TOTAL_GAP_CB: item?.quantite_grains_b_from_mobile > item?.quantite_grains_b_rapport ? item?.quantite_grains_b_from_mobile - item?.quantite_grains_b_rapport : item?.quantite_grains_b_rapport - item?.quantite_grains_b_from_mobile || "",
-
-
 
   //         DATE_CREATION: item?.created_at
   //           ? new Date(item?.created_at).toLocaleString('fr-FR', {
@@ -347,10 +380,14 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
   const HandleDelete = async (id) => {
     const promise = new Promise(async (resolve, reject) => {
       try {
-        const results = await fetchData("delete", `/mais/rapportages_sdl_ct/${id}/`, {
-          params: {},
-          additionalHeaders: {},
-        });
+        const results = await fetchData(
+          "delete",
+          `/mais/rapportages_sdl_ct/${id}/`,
+          {
+            params: {},
+            additionalHeaders: {},
+          },
+        );
         if (results) {
           resolve({ id });
         } else {
@@ -398,20 +435,35 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
                 Actions
               </DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(hangar.hangar.ct_code)}
+                onClick={() =>
+                  navigator.clipboard.writeText(hangar.hangar.ct_code)
+                }
               >
                 Copier code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link href={`/anagessa-dashboard/hangarss/details/?id=${hangar.hangar.ct_id}`}>
+              <Link
+                href={`/anagessa-dashboard/hangarss/details/?id=${hangar.hangar.ct_id}`}
+              >
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
-              {(user?.session?.category === "Admin" || user?.session?.category === "ANAGESSA") && (
+              {(user?.session?.category === "Admin" ||
+                user?.session?.category === "ANAGESSA") && (
                 <EditRapport id={hangar?.id} />
               )}
-              {(user?.session?.category === "Admin" || user?.session?.category === "ANAGESSA") && (
-                <DropdownMenuItem onClick={() => HandleDelete(hangar?.id)} className="text-destructive" asChild>
-                  <Button variant="ghost" className="text-destructive text-sm justify-start font-normal">Supprimer</Button>
+              {(user?.session?.category === "Admin" ||
+                user?.session?.category === "ANAGESSA") && (
+                <DropdownMenuItem
+                  onClick={() => HandleDelete(hangar?.id)}
+                  className="text-destructive"
+                  asChild
+                >
+                  <Button
+                    variant="ghost"
+                    className="text-destructive text-sm justify-start font-normal"
+                  >
+                    Supprimer
+                  </Button>
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
@@ -516,15 +568,19 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
               <div className="text-lg  font-semibold tracking-tight tabular-nums">
                 {qte_tot_achetee?.total_collecte >= 1000 ? (
                   <>
-                    {(qte_tot_achetee?.total_collecte / 1000).toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{" "}
+                    {(qte_tot_achetee?.total_collecte / 1000).toLocaleString(
+                      "fr-FR",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      },
+                    )}{" "}
                     <span className="text-base">T</span>
                   </>
                 ) : (
                   <>
-                    {qte_tot_achetee?.total_collecte?.toLocaleString("fr-FR") || 0}{" "}
+                    {qte_tot_achetee?.total_collecte?.toLocaleString("fr-FR") ||
+                      0}{" "}
                     <span className="text-sm">Kg</span>
                   </>
                 )}
@@ -533,27 +589,30 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
             <div>
               <div className="flex flex-col gap-y-1 text-xs font-medium">
                 <div className="flex flex-row gap-x-2 items-center">
-                  <span className="text-primary flex items-center gap-1">●</span>
+                  <span className="text-primary flex items-center gap-1">
+                    ●
+                  </span>
                   <div className="flex flex-row gap-x-1 items-center">
                     <div className="text-md font-semibold text-primary">
-                      MaÃ¯s blanc :
+                      Maïs blanc :
                     </div>
                   </div>
                   <div className="font-semibold text-accent-foreground text-sm">
                     {qte_tot_achetee?.total_ca_collecte >= 1000 ? (
                       <>
-                        {(qte_tot_achetee?.total_ca_collecte / 1000).toLocaleString(
-                          "fr-FR",
-                          {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          },
-                        )}{" "}
+                        {(
+                          qte_tot_achetee?.total_ca_collecte / 1000
+                        ).toLocaleString("fr-FR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}{" "}
                         <span className="text-sm">T</span>
                       </>
                     ) : (
                       <>
-                        {qte_tot_achetee?.total_ca_collecte?.toLocaleString("fr-FR") || 0}{" "}
+                        {qte_tot_achetee?.total_ca_collecte?.toLocaleString(
+                          "fr-FR",
+                        ) || 0}{" "}
                         <span className="text-xs">Kg</span>
                       </>
                     )}
@@ -568,24 +627,25 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
                   </span>
                   <div className="flex flex-row gap-x-1 items-center">
                     <div className="text-md font-semibold text-secondary">
-                      MaÃ¯s jaune :
+                      Maïs jaune :
                     </div>
                   </div>
                   <div className="font-semibold text-accent-foreground text-sm">
                     {qte_tot_achetee?.total_cb_collecte >= 1000 ? (
                       <>
-                        {(qte_tot_achetee?.total_cb_collecte / 1000).toLocaleString(
-                          "fr-FR",
-                          {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          },
-                        )}
+                        {(
+                          qte_tot_achetee?.total_cb_collecte / 1000
+                        ).toLocaleString("fr-FR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                         <span className="text-xs">T</span>
                       </>
                     ) : (
                       <>
-                        {qte_tot_achetee?.total_cb_collecte?.toLocaleString("fr-FR") || 0}{" "}
+                        {qte_tot_achetee?.total_cb_collecte?.toLocaleString(
+                          "fr-FR",
+                        ) || 0}{" "}
                         <span className="text-xs">Kg</span>
                       </>
                     )}
@@ -596,7 +656,6 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
                 </div>
               </div>
             </div>
-
           </div>
         );
       },
@@ -612,15 +671,20 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
               <div className="text-lg  font-semibold tracking-tight tabular-nums">
                 {qte_tot_rapportee?.total_rapport >= 1000 ? (
                   <>
-                    {(qte_tot_rapportee?.total_rapport / 1000).toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{" "}
+                    {(qte_tot_rapportee?.total_rapport / 1000).toLocaleString(
+                      "fr-FR",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      },
+                    )}{" "}
                     <span className="text-base">T</span>
                   </>
                 ) : (
                   <>
-                    {qte_tot_rapportee?.total_rapport?.toLocaleString("fr-FR") || 0}{" "}
+                    {qte_tot_rapportee?.total_rapport?.toLocaleString(
+                      "fr-FR",
+                    ) || 0}{" "}
                     <span className="text-sm">Kg</span>
                   </>
                 )}
@@ -629,27 +693,30 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
             <div>
               <div className="flex flex-col gap-y-1 text-xs font-medium">
                 <div className="flex flex-row gap-x-2 items-center">
-                  <span className="text-primary flex items-center gap-1">●</span>
+                  <span className="text-primary flex items-center gap-1">
+                    ●
+                  </span>
                   <div className="flex flex-row gap-x-1 items-center">
                     <div className="text-md font-semibold text-primary">
-                      MaÃ¯s blanc :
+                      Maïs blanc :
                     </div>
                   </div>
                   <div className="font-semibold text-accent-foreground text-sm">
                     {qte_tot_rapportee?.total_ca_rapport >= 1000 ? (
                       <>
-                        {(qte_tot_rapportee?.total_ca_rapport / 1000).toLocaleString(
-                          "fr-FR",
-                          {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          },
-                        )}{" "}
+                        {(
+                          qte_tot_rapportee?.total_ca_rapport / 1000
+                        ).toLocaleString("fr-FR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}{" "}
                         <span className="text-sm">T</span>
                       </>
                     ) : (
                       <>
-                        {qte_tot_rapportee?.total_ca_rapport?.toLocaleString("fr-FR") || 0}{" "}
+                        {qte_tot_rapportee?.total_ca_rapport?.toLocaleString(
+                          "fr-FR",
+                        ) || 0}{" "}
                         <span className="text-xs">Kg</span>
                       </>
                     )}
@@ -664,24 +731,25 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
                   </span>
                   <div className="flex flex-row gap-x-1 items-center">
                     <div className="text-md font-semibold text-secondary">
-                      MaÃ¯s jaune :
+                      Maïs jaune :
                     </div>
                   </div>
                   <div className="font-semibold text-accent-foreground text-sm">
                     {qte_tot_rapportee?.total_cb_rapport >= 1000 ? (
                       <>
-                        {(qte_tot_rapportee?.total_cb_rapport / 1000).toLocaleString(
-                          "fr-FR",
-                          {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          },
-                        )}
+                        {(
+                          qte_tot_rapportee?.total_cb_rapport / 1000
+                        ).toLocaleString("fr-FR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                         <span className="text-xs">T</span>
                       </>
                     ) : (
                       <>
-                        {qte_tot_rapportee?.total_cb_rapport?.toLocaleString("fr-FR") || 0}{" "}
+                        {qte_tot_rapportee?.total_cb_rapport?.toLocaleString(
+                          "fr-FR",
+                        ) || 0}{" "}
                         <span className="text-xs">Kg</span>
                       </>
                     )}
@@ -692,7 +760,6 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
                 </div>
               </div>
             </div>
-
           </div>
         );
       },
@@ -725,22 +792,21 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
             <div>
               <div className="flex flex-col gap-y-1 text-xs font-medium">
                 <div className="flex flex-row gap-x-2 items-center">
-                  <span className="text-primary flex items-center gap-1">●</span>
+                  <span className="text-primary flex items-center gap-1">
+                    ●
+                  </span>
                   <div className="flex flex-row gap-x-1 items-center">
                     <div className="text-md font-semibold text-primary">
-                      MaÃ¯s blanc :
+                      Maïs blanc :
                     </div>
                   </div>
                   <div className="font-semibold text-accent-foreground text-sm">
                     {gap?.total_gap_ca >= 1000 ? (
                       <>
-                        {(gap?.total_gap_ca / 1000).toLocaleString(
-                          "fr-FR",
-                          {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          },
-                        )}{" "}
+                        {(gap?.total_gap_ca / 1000).toLocaleString("fr-FR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}{" "}
                         <span className="text-sm">T</span>
                       </>
                     ) : (
@@ -760,19 +826,16 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
                   </span>
                   <div className="flex flex-row gap-x-1 items-center">
                     <div className="text-md font-semibold text-secondary">
-                      MaÃ¯s jaune :
+                      Maïs jaune :
                     </div>
                   </div>
                   <div className="font-semibold text-accent-foreground text-sm">
                     {gap?.total_gap_cb >= 1000 ? (
                       <>
-                        {(gap?.total_gap_cb / 1000).toLocaleString(
-                          "fr-FR",
-                          {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          },
-                        )}
+                        {(gap?.total_gap_cb / 1000).toLocaleString("fr-FR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                         <span className="text-xs">T</span>
                       </>
                     ) : (
@@ -788,11 +851,10 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
                 </div>
               </div>
             </div>
-
           </div>
         );
       },
-    }
+    },
   ];
   const datapaginationlimit = (limitdata) => {
     setLimit(limitdata);
@@ -820,7 +882,6 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
 
   return (
     <div className="w-full bg-sidebar p-4 rounded-lg">
-
       <>
         <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
           <div className="relative ">
@@ -878,9 +939,9 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
                       </TableHead>
                     );
                   })}
@@ -947,7 +1008,6 @@ export default function HangarsListTableReports({ isLoading: externalLoading }) 
           />
         </div>
       </>
-
     </div>
   );
 }

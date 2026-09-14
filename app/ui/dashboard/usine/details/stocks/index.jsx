@@ -18,13 +18,13 @@ export default function Stocks({ data = [] }) {
   // In a real app, this might be snapshot data or derived from ins/outs
   const stocks = [
     {
-      grade: "MaÃ¯s blanc",
+      grade: "Maïs blanc",
       proprietaire: "Coopérative KAWA",
       stock: 15400,
       bloque: 0,
     },
     {
-      grade: "MaÃ¯s blanc",
+      grade: "Maïs blanc",
       proprietaire: "SOGESTAL",
       stock: 8200,
       bloque: 500, // e.g., quality control hold

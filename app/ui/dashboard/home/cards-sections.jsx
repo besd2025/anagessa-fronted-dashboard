@@ -18,10 +18,12 @@ import {
   Squircle,
   ArchiveRestore,
   Package,
+  UsersRound,
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { StatsCardSkeleton } from "@/components/ui/skeletons";
 import { UserContext } from "@/app/context/User_Context";
+import { Separator } from "@/components/ui/separator";
 
 export function SectionCards() {
   const [data, setData] = React.useState({});
@@ -33,6 +35,8 @@ export function SectionCards() {
   const [stockInitialHDZ, setStockInitialHDZ] = React.useState({});
   const [isLoading, setIsLoading] = React.useState(true);
   const user = React.useContext(UserContext);
+  const [total_cultivators, setTotalCultivators] = React.useState(null);
+  const [total_hangars, setTotalHangars] = React.useState(null);
 
   React.useEffect(() => {
     const getDatas = async () => {
@@ -46,6 +50,8 @@ export function SectionCards() {
           prix,
           stockInitHZ,
           stockInitHDZ,
+          totalCultivatorsRes,
+          totalHangarsRes,
         ] = await Promise.allSettled([
           fetchData("get", "stock_resume/"),
           fetchData("get", "sorties/somme_totale_sorties/"),
@@ -54,6 +60,8 @@ export function SectionCards() {
           fetchData("get", "admin/prices/get_prix_achat/"),
           fetchData("get", "stock_resume_initial/"),
           fetchData("get", "stock_resume_initial/?detail=true"),
+          fetchData("get", "cultivators/total_cultivators/"),
+          fetchData("get", "hangars/total/"),
         ]);
 
         if (stockResume.status === "fulfilled")
@@ -67,6 +75,22 @@ export function SectionCards() {
           setStockInitialHZ(stockInitHZ.value || {});
         if (stockInitHDZ.status === "fulfilled")
           setStockInitialHDZ(stockInitHDZ.value || {});
+        if (totalCultivatorsRes.status === "fulfilled") {
+          const res = totalCultivatorsRes.value;
+          const count =
+            typeof res === "number"
+              ? res
+              : (res?.total_cultivators ?? res?.count ?? res?.total ?? 0);
+          setTotalCultivators(count);
+        }
+        if (totalHangarsRes.status === "fulfilled") {
+          const res = totalHangarsRes.value;
+          const count =
+            typeof res === "number"
+              ? res
+              : (res?.total_hangars ?? res?.count ?? res?.total ?? 0);
+          setTotalHangars(count);
+        }
       } catch (error) {
         console.error("Error fetching section cards data:", error);
       } finally {
@@ -110,6 +134,14 @@ export function SectionCards() {
   const totalStockInit =
     (stockInitialHZ?.total || 0) + (stockInitialHDZ?.total || 0);
 
+  const cultivatorsCount =
+    typeof total_cultivators === "number"
+      ? total_cultivators
+      : (total_cultivators?.total_cultivators ??
+        total_cultivators?.count ??
+        total_cultivators?.total ??
+        0);
+
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-12">
       {/* Carte 1: Quantité Collectée */}
@@ -118,7 +150,7 @@ export function SectionCards() {
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-2 items-center">
             <div className="bg-primary p-2 rounded-md">
-              <ArchiveRestore className="text-white" />
+              <ArchiveRestore className="text-white size-5" />
             </div>
             <CardTitle className="text-2xl @[250px]/card:text-3xl font-semibold tracking-tight tabular-nums">
               {totalCollecte >= 1000 ? (
@@ -302,35 +334,34 @@ export function SectionCards() {
         </CardHeader>
       </Card>
 
-      {/* Carte 3: GAP & Stock Initial */}
-      <Card className="@container/card col-span-12 @5xl/main:col-span-3 relative border-rose-500/20">
+      {/* Carte 4: Total caféiculteurs */}
+      <Card className="@container/card col-span-12 @5xl/main:col-span-3 relative">
         <CardHeader className="flex flex-col">
           <div className="flex flex-row gap-x-3 items-center">
-            <div className="bg-destructive p-2.5 rounded-xl shadow-xs text-white">
-              <Package className="h-5 w-5" />
+            <div className="bg-primary p-2.5 rounded-xl shadow-xs text-white">
+              <UsersRound className="h-5 w-5" />
             </div>
             <div>
               <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Stock Initial
-                <span className="text-xs font-normal text-muted-foreground normal-case block">
-                  (Avant Campagne)
-                </span>
+                Total caféiculteurs
               </CardDescription>
-              <CardTitle className="text-2xl @[250px]/card:text-3xl font-bold tracking-tight  tabular-nums">
-                {totalStockInit >= 1000 ? (
-                  <>
-                    {(totalStockInit / 1000).toLocaleString("fr-FR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{" "}
-                    <span className="text-base font-normal">T</span>
-                  </>
-                ) : (
-                  <>
-                    {totalStockInit.toLocaleString("fr-FR")}{" "}
-                    <span className="text-sm font-normal">Kg</span>
-                  </>
-                )}
+              <CardTitle className="text-2xl @[250px]/card:text-3xl font-bold tracking-tight tabular-nums">
+                {Number(cultivatorsCount || 0).toLocaleString("fr-FR")}
+              </CardTitle>
+            </div>
+          </div>
+        </CardHeader>
+        <CardHeader className="flex flex-col">
+          <div className="flex flex-row gap-x-3 items-center">
+            <div className="bg-primary p-2.5 rounded-xl shadow-xs text-white">
+              <UsersRound className="h-5 w-5" />
+            </div>
+            <div>
+              <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Total Hangars
+              </CardDescription>
+              <CardTitle className="text-2xl @[250px]/card:text-3xl font-bold tracking-tight tabular-nums">
+                {Number(total_hangars || 0).toLocaleString("fr-FR")}
               </CardTitle>
             </div>
           </div>

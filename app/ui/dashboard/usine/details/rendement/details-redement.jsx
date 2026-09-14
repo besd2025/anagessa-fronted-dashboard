@@ -24,28 +24,30 @@ export default function DetailsRendement() {
           <div className="mt-2 flex flex-col gap-y-2">
             <div className="#CA border rounded p-2">
               <h1 className="flex gap-x-2 bg-primary w-max items-center py-1 px-2 rounded-lg text-primary-foreground">
-                <Grape size={20} /> MaÃ¯s blanc </h1>
+                <Grape size={20} /> Maïs blanc{" "}
+              </h1>
               <div className="mt-2 flex flex-col gap-y-2">
                 <div className="flex items-center justify-between text-sm ">
-                  <span className="text-muted-foreground">MaÃ¯s blanc</span>
+                  <span className="text-muted-foreground">Maïs blanc</span>
                   <span className="font-medium">7.5 kg</span>
                 </div>
                 <div className="flex items-center justify-between text-sm ">
-                  <span className="text-muted-foreground">MaÃ¯s blanc</span>
+                  <span className="text-muted-foreground">Maïs blanc</span>
                   <span className="font-medium">7.5 kg</span>
                 </div>
               </div>
             </div>
             <div className="#CA border rounded p-2">
               <h1 className="flex gap-x-2 bg-secondary w-max items-center py-1 px-2 rounded-lg text-primary-foreground">
-                <Grape size={20} /> MaÃ¯s jaune </h1>
+                <Grape size={20} /> Maïs jaune{" "}
+              </h1>
               <div className="mt-2 flex flex-col gap-y-2">
                 <div className="flex items-center justify-between text-sm ">
-                  <span className="text-muted-foreground">MaÃ¯s jaune</span>
+                  <span className="text-muted-foreground">Maïs jaune</span>
                   <span className="font-medium">7.5 kg</span>
                 </div>
                 <div className="flex items-center justify-between text-sm ">
-                  <span className="text-muted-foreground">MaÃ¯s jaune</span>
+                  <span className="text-muted-foreground">Maïs jaune</span>
                   <span className="font-medium">7.5 kg</span>
                 </div>
               </div>

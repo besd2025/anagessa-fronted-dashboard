@@ -134,7 +134,7 @@ export default function StatsCard({ id }) {
                 <div className="flex flex-row gap-x-1 items-center">
                   <Grape className="text-primary size-5" />
                   <CardTitle className="text-md font-semibold text-primary">
-                    MaÃ¯s blanc :
+                    Maïs blanc :
                   </CardTitle>
                 </div>
                 <CardDescription className="font-semibold text-accent-foreground text-lg">
@@ -168,7 +168,7 @@ export default function StatsCard({ id }) {
                 <div className="flex flex-row gap-x-1 items-center">
                   <Grape className="text-secondary size-5" />
                   <CardTitle className="text-md font-semibold text-secondary">
-                    MaÃ¯s jaune :
+                    Maïs jaune :
                   </CardTitle>
                 </div>
                 <CardDescription className="font-semibold text-accent-foreground text-lg">

@@ -38,7 +38,7 @@ export default function Sorties({ data = [] }) {
         id: 1,
         date: "2024-05-20",
         proprietaire: "Coopérative KAWA",
-        grade: "MaÃ¯s blanc",
+        grade: "Maïs blanc",
         quantite: 5000,
         motif: "Vente",
         destination: "Client X (Belgique)",
@@ -56,7 +56,7 @@ export default function Sorties({ data = [] }) {
         id: 3,
         date: "2024-05-22",
         proprietaire: "Coopérative KAWA",
-        grade: "MaÃ¯s blanc",
+        grade: "Maïs blanc",
         quantite: 12000, // Potential alert if this exceeds stock logic, but for now just data
         motif: "Transfert",
         destination: "", // Missing destination
@@ -252,9 +252,9 @@ export default function Sorties({ data = [] }) {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                     </TableHead>
                   ))}
                 </TableRow>

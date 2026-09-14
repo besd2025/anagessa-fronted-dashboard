@@ -38,7 +38,7 @@ export default function Receptions({ data = [] }) {
         id: 1,
         date: "2024-05-15",
         proprietaire: "Coopérative KAWA",
-        categorie: "grains MaÃ¯s blanc",
+        categorie: "grains Maïs blanc",
         quantite: 5000,
         lot: "LOT-24-001",
         statut: "Validé",
@@ -47,7 +47,7 @@ export default function Receptions({ data = [] }) {
         id: 2,
         date: "2024-05-16",
         proprietaire: "SOGESTAL",
-        categorie: "grains MaÃ¯s jaune",
+        categorie: "grains Maïs jaune",
         quantite: 3200,
         lot: "LOT-24-002",
         statut: "En attente",
@@ -234,9 +234,9 @@ export default function Receptions({ data = [] }) {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                     </TableHead>
                   ))}
                 </TableRow>

@@ -10,30 +10,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import PaginationControls from "@/components/ui/pagination-controls";
-import ComingSoonOverlay from "@/app/ui/components/coming-soon-overlay";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const products = [
   {
     id: 101,
-    date: "12/8/2025",
-    sdl_ct_type: "hangar",
-    sdl_ct_name: "Ngome",
-    No_fiche: 59.99,
-    No_recus: 4.5,
-    ca: 452,
-    cb: 52,
-    fiche_photo: "/images/logo_1.jpg",
-  },
-  {
-    id: 102,
-    date: "12/8/2025",
-    sdl_ct_type: "hangar",
-    sdl_ct_name: "Ngome",
-    No_fiche: 59.99,
-    No_recus: 4.5,
-    ca: 452,
-    cb: 52,
-    fiche_photo: "/images/logo_1.jpg",
+    name: "",
+    cni: "",
+    dob: "",
+    bank_type: "",
+    bank_name: "",
+    account_number: "",
   },
 ];
 
@@ -57,53 +44,62 @@ export default function EditHistory() {
 
   return (
     <div className="w-full relative">
-      <div className="w-full border rounded-md overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="pl-4">ID</TableHead>
-              <TableHead>Date d'achat</TableHead>
-              <TableHead>Hangar</TableHead>
-              <TableHead>No Fiche</TableHead>
-              <TableHead>No Recus</TableHead>
-              <TableHead>CA</TableHead>
-              <TableHead>CB</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedProducts.map((product) => (
-              <TableRow key={product.id} className="odd:bg-muted/50">
-                <TableCell className="pl-4">{product.id}</TableCell>
-                <TableCell className="font-medium">{product.date}</TableCell>
-                <TableCell>
-                  {product.sdl_ct_type} {product.sdl_ct_name}
-                </TableCell>
-                <TableCell>{product.No_fiche}</TableCell>
-                <TableCell>{product.No_recus}</TableCell>
-                <TableCell>{product.ca}</TableCell>
-                <TableCell>{product.cb}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      <Tabs defaultValue="identification" className="">
+        <TabsList className="gap-x-4">
+          <TabsTrigger value="identification">Identification</TabsTrigger>
+          <TabsTrigger value="achats">Achats</TabsTrigger>
+        </TabsList>
+        <TabsContent value="identification" className="w-full">
+          <div className="w-full border rounded-md overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="pl-4">ID</TableHead>
+                  <TableHead>Nom et Prenom</TableHead>
+                  <TableHead>CNI</TableHead>
+                  <TableHead>Date de naissance</TableHead>
+                  <TableHead>Type de Bank </TableHead>
+                  <TableHead>Banque</TableHead>
+                  <TableHead>N° compte</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedProducts.map((product) => (
+                  <TableRow key={product.id} className="odd:bg-muted/50">
+                    <TableCell className="pl-4">{product.id}</TableCell>
+                    <TableCell className="font-medium">
+                      {product.name}
+                    </TableCell>
+                    <TableCell>{product.cni}</TableCell>
+                    <TableCell>{product.dob}</TableCell>
+                    <TableCell>{product.bank_type}</TableCell>
+                    <TableCell>{product.bank_name}</TableCell>
+                    <TableCell>{product.account_number}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
-      </div>
+          <PaginationControls
+            className="mt-4"
+            page={page}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            onPageSizeChange={(size) => {
+              setPage(1);
+              setPageSize(size);
+            }}
+            hasNextPage={page < totalPages}
+            hasPreviousPage={page > 1}
+          />
+        </TabsContent>
+        <TabsContent value="achats">Change your password here.</TabsContent>
+      </Tabs>
 
-      <PaginationControls
-        className="mt-4"
-        page={page}
-        pageSize={pageSize}
-        totalItems={totalItems}
-        totalPages={totalPages}
-        onPageChange={setPage}
-        onPageSizeChange={(size) => {
-          setPage(1);
-          setPageSize(size);
-        }}
-        hasNextPage={page < totalPages}
-        hasPreviousPage={page > 1}
-      />
-      <ComingSoonOverlay transparent={true} />
+      {/* <ComingSoonOverlay transparent={true} /> */}
     </div>
   );
 }

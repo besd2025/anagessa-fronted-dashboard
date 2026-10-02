@@ -7,6 +7,8 @@ import { StockSummaryCard } from "./stock-card";
 import { KPIGrid } from "./kpi-stats";
 import { UserContext } from "@/app/context/User_Context";
 import React, { useContext } from "react";
+import { LocationChart } from "../cultivators/analytics/components/LocationChart";
+import { GenreChart } from "../cultivators/analytics/components/GenreChart";
 
 function DashboardContainer() {
   const user = useContext(UserContext);
@@ -35,7 +37,15 @@ function DashboardContainer() {
               <ChartLineAchats />
             </div>
           </div>
-
+          <div className="px-4 lg:px-6 grid grid-cols-5 gap-4">
+            {/* Stock Card + Hangar Activity */}
+            <div className="col-span-5 lg:col-span-3 flex flex-col gap-4">
+              <LocationChart />
+            </div>
+            <div className="col-span-5 lg:col-span-2 flex flex-col gap-4">
+              <GenreChart />
+            </div>
+          </div>
           {/* <div className="px-4 lg:px-6">
             <LossChart />
           </div> */}

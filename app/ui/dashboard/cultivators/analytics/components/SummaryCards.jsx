@@ -19,7 +19,6 @@ export function SummaryCards() {
   React.useEffect(() => {
     const getCultivators = async () => {
       try {
-
         const count_cultivateurs = await fetchData(
           "get",
           `cultivators/total_cultivators/`,
@@ -52,7 +51,7 @@ export function SummaryCards() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-4">
       <Card className="@container/card">
         <CardHeader>
           <div className="flex flex-row gap-x-2 items-center">
@@ -77,8 +76,11 @@ export function SummaryCards() {
         <CardContent>
           <div className="text-2xl font-bold">{data?.total_cultivators}</div>
           <p className="text-xs text-muted-foreground">
-            {((data?.total_cultivators / data?.total_cultivators) * 100).toFixed(1)}% du
-            total
+            {(
+              (data?.total_cultivators / data?.total_cultivators) *
+              100
+            ).toFixed(1)}
+            % du total
           </p>
         </CardContent>
       </Card>
@@ -90,10 +92,32 @@ export function SummaryCards() {
           <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{resultsData?.association || 0}</div>
+          <div className="text-2xl font-bold">
+            {resultsData?.association || 0}
+          </div>
           <p className="text-xs text-muted-foreground">
-            {((resultsData?.association || 0 / data?.total_cultivators) * 100).toFixed(1) || 0}% du
-            total
+            {(
+              (resultsData?.association || 0 / data?.total_cultivators) * 100
+            ).toFixed(1) || 0}
+            % du total
+          </p>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
+          <CardTitle className="font-medium">Cultivateurs Actif</CardTitle>
+          <Users className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">
+            {resultsData?.association || 0}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Cultivateurs ayant vendu leur récolte{" "}
+            {(
+              (resultsData?.association || 0 / data?.total_cultivators) * 100
+            ).toFixed(1) || 0}
+            % du total
           </p>
         </CardContent>
       </Card>

@@ -95,13 +95,13 @@ function StatsCard({ cult_id }) {
             )}
           </div>
           <CardTitle className="text-lg font-semibold tabular-nums  ">
-            Qte Vendue (CA+CB)
+            Qte Vendue
           </CardTitle>
 
           <div className="mt-2 space-y-3 w-full">
             <div className="flex justify-between items-end">
               <span className="text-xs text-muted-foreground ">
-                Rapport grains A / B
+                Rapport grains Blanc / Jaune
               </span>
               {/* <span className="text-[10px] font-mono text-muted-foreground">
                 Ratio: 65%
@@ -119,11 +119,13 @@ function StatsCard({ cult_id }) {
               />
             </div>
             <div className="flex flex-wrap gap-y-2 justify-between text-xs font-medium">
-              <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-max">
-                <span className="text-primary flex items-center gap-1">●</span>
+              <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg w-max">
+                <span className="text-secondary flex items-center gap-1">
+                  ●
+                </span>
                 <div className="flex flex-row gap-x-1 items-center">
-                  <Grape className="text-primary size-5" />
-                  <CardTitle className="text-md font-semibold text-primary">
+                  <Grape className="text-secondary size-5" />
+                  <CardTitle className="text-md font-semibold text-secondary">
                     Maïs blanc :
                   </CardTitle>
                 </div>
@@ -155,13 +157,13 @@ function StatsCard({ cult_id }) {
                 </CardDescription>
               </div>
               <span className="w-0.5 h-8 bg-black/20 hidden lg:block"></span>
-              <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg">
+              <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg">
                 <span className="text-secondary flex items-center gap-1">
                   ●
                 </span>
                 <div className="flex flex-row gap-x-1 items-center">
-                  <Grape className="text-secondary size-5" />
-                  <CardTitle className="text-md font-semibold text-secondary">
+                  <Grape className="text-primary size-5" />
+                  <CardTitle className="text-md font-semibold text-primary">
                     Maïs jaune :
                   </CardTitle>
                 </div>
@@ -276,7 +278,7 @@ function StatsCard({ cult_id }) {
                     Proprietaire
                   </div>
                   <div className=" font-semibold tracking-tight tabular-nums">
-                    {data?.cultivator_account_owner}
+                    {data?.cultivator_mobile_payment_user_name}
                   </div>
                 </div>
               </div>

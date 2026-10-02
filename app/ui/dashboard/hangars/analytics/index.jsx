@@ -14,13 +14,7 @@ export default function HangarAnalytics() {
       <HangarSummaryCards />
 
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
-        {/* Pie Chart: Active vs Non-Active */}
-        <HangarActiveChart />
-
-        {/* Pie Chart: Private vs Public */}
-        <HangarTypeChart />
-
-        <div className="col-span-1 lg:col-span-3">
+        <div className="col-span-1 lg:col-span-6">
           <HangarLocationChart />
         </div>
       </div>

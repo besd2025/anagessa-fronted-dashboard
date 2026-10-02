@@ -2,7 +2,14 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sprout, Trees, Scale, MoreHorizontal, Users } from "lucide-react";
+import {
+  Sprout,
+  Trees,
+  Scale,
+  MoreHorizontal,
+  Users,
+  User,
+} from "lucide-react";
 import ViewImageDialog from "@/components/ui/view-image-dialog";
 import { Button } from "@/components/ui/button";
 import { fetchData } from "@/app/_utils/api";
@@ -35,8 +42,8 @@ function TopListCard({ title, icon, data }) {
               </div>
               <div className="flex items-center justify-center col-span-1">
                 <div className="text-sm text-muted-foreground">
-                  {item.value.toLocaleString()}{" "}
-                  <span className="text-xs">{item.sub}</span>
+                  {item?.value.toLocaleString()}{" "}
+                  <span className="text-xs">{item?.sub}</span>
                 </div>
               </div>
               <div className="col-span-1 flex justify-end ">
@@ -47,7 +54,7 @@ function TopListCard({ title, icon, data }) {
                       <MoreHorizontal />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start">
+                  <DropdownMenuContent align="end">
                     <Link
                       href={`/anagessa-dashboard/cultivators/profile/?id=${item.id}`}
                     >
@@ -66,6 +73,7 @@ function TopListCard({ title, icon, data }) {
 
 export function TopFiveCards() {
   const [loading, setLoading] = React.useState(true);
+  const [recentCultivators, setRecentCultivators] = React.useState([]);
   const [datatopChamps, setDataTopChamps] = React.useState([]);
   const [datatopPieds, setDataTopPieds] = React.useState([]);
   const [datatopQtes, setDataTopQtes] = React.useState([]);
@@ -116,7 +124,7 @@ export function TopFiveCards() {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
         const topChamps = response.map((item) => ({
           id: item?.cultivateur_champ__id,
@@ -144,7 +152,7 @@ export function TopFiveCards() {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
         const topPieds = response.map((item) => ({
           id: item?.cultivateur_champ__id,
@@ -173,7 +181,7 @@ export function TopFiveCards() {
             params: {},
             additionalHeaders: {},
             body: {},
-          }
+          },
         );
         console.log("ggggg", response);
         const topQtes = response.map((item) => ({
@@ -193,9 +201,37 @@ export function TopFiveCards() {
         console.error("Error fetching cultivators data:", error);
       }
     };
+    async function getRecentCultivators() {
+      try {
+        const results = await fetchData("get", "cultivators/cinq_recents/", {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        });
+        console.log("recents", results);
+        const recentCultivators = results.map((item) => ({
+          id: item?.id,
+          image: process.env.NEXT_PUBLIC_IMAGE_URL + item?.cultivator_photo,
+          name: item?.cultivator_last_name + " " + item?.cultivator_first_name,
+          value: "",
+          sub: new Date(item?.created_at).toLocaleDateString(),
+        }));
+        setRecentCultivators(recentCultivators);
+      } catch (error) {
+        setError(error);
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
     const fetchAll = async () => {
       setLoading(true);
-      await Promise.all([getChamps(), getTopPieds(), getTopQtes()]);
+      await Promise.all([
+        getChamps(),
+        getTopPieds(),
+        getTopQtes(),
+        getRecentCultivators(),
+      ]);
       setLoading(false);
     };
     fetchAll();
@@ -248,31 +284,16 @@ export function TopFiveCards() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      {/* <TopListCard
-        title="Top 5 - Nombre de Champs"
-        icon={<Sprout className="h-4 w-4" />}
-        data={datatopChamps}
-      />
       <TopListCard
-        title="Top 5 - Nombre de Pieds"
-        icon={<Trees className="h-4 w-4" />}
-        data={datatopPieds}
-      /> */}
+        title="Cultivateurs récemment enregistrés"
+        icon={<Users className="h-4 w-4" />}
+        data={recentCultivators}
+      />
       <TopListCard
         title="Top 5 - Quantité personne Physique"
         icon={<Scale className="h-4 w-4" />}
         data={datatopQtes}
       />
-      {/* <TopListCard
-        title="Top 5 - Quantité personne Morale"
-        icon={<Scale className="h-4 w-4" />}
-        data={datatopQtes}
-      />
-      <TopListCard
-        title="Top 5 - Societe avec cultivateurs enregistrée"
-        icon={<Users className="h-4 w-4" />}
-        data={datatopSocieties}
-      /> */}
     </div>
   );
 }

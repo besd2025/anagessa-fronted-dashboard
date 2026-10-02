@@ -442,7 +442,7 @@ export default function IndividualCultivatorsTable({
           const localite = row.original.localite;
           return (
             <div className="text-sm">
-              {localite?.commune}, {localite?.province}
+              {localite?.province}, {localite?.commune}, {localite?.colline}
             </div>
           );
         },

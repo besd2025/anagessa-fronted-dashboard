@@ -149,7 +149,7 @@ function ProfileCard({ cult_id }) {
                   <ViewImageDialog
                     imageUrl={data?.cultivator_photo}
                     className="size-full object-cover"
-                  // fallbackUrl=""
+                    // fallbackUrl=""
                   />
                 </>
               ) : (
@@ -182,8 +182,8 @@ function ProfileCard({ cult_id }) {
                 <p className="text-xl font-semibold">
                   {data?.cultivator_entity_type === "personne"
                     ? data?.cultivator_first_name +
-                    " " +
-                    data?.cultivator_last_name
+                      " " +
+                      data?.cultivator_last_name
                     : data?.cultivator_assoc_name}
                 </p>
               )}
@@ -271,12 +271,6 @@ function ProfileCard({ cult_id }) {
             ) : (
               <>
                 <div>
-                  <div className="flex items-center justify-between text-sm flex-col gap-y-1">
-                    <span className="text-muted-foreground">Numéro Fiche</span>
-                    <span className="font-medium">
-                      {data?.cultivator_assoc_numero_fiche}
-                    </span>
-                  </div>
                   <div className="flex items-center justify-between text-sm flex-col gap-y-1">
                     <span className="text-muted-foreground">CNI</span>
 
@@ -447,15 +441,22 @@ function ProfileCard({ cult_id }) {
                 </Dialog>
               </div> */}
             </div>
+
             <div>
-              {/* <div className="flex items-center justify-between text-sm ">
-                <span className="text-muted-foreground">hangar / Hangar</span>
-                <Link href="/anagessa-dashboard/hangarss/details">
+              <div className="flex items-center justify-between text-sm flex-col gap-y-1">
+                <span className="text-muted-foreground">Hangar enregistré</span>
+                <Link
+                  href={`/anagessa-dashboard/hangars/details?id=${data?.collector?.hangar?.id}`}
+                >
                   <Button variant="link" className="p-0">
-                    BUHANZA
+                    {loading ? (
+                      <Skeleton className="h-5 w-24 mx-auto" />
+                    ) : (
+                      data?.collector?.hangar?.hangar_name
+                    )}
                   </Button>
                 </Link>
-              </div> */}
+              </div>
             </div>
           </div>
         </>

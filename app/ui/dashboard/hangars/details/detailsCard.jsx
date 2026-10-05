@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { fetchData } from "@/app/_utils/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Grape,
+  Squircle,
   MapPinHouse,
   Phone,
   QrCode,
@@ -107,7 +107,6 @@ function DetailsCard({ id }) {
             </svg>
           </div>
           <div className="text-xs font-semibold text-center truncate w-full">
-            hangar{" "}
             {data?.hangar_name
               ? data.hangar_name.slice(0, 2).toUpperCase() + "..."
               : "--"}
@@ -140,7 +139,7 @@ function DetailsCard({ id }) {
               {loading ? (
                 <Skeleton className="h-7 w-48 mx-auto" />
               ) : (
-                <p className="text-xl font-semibold">hangar {data?.hangar_name}</p>
+                <p className="text-xl font-semibold">{data?.hangar_name}</p>
               )}
               <p className="text-lg text-primary font-bold flex flex-row justify-center gap-x-2">
                 {""}
@@ -152,7 +151,11 @@ function DetailsCard({ id }) {
             >
               <QrCode size={30} />
               <span className="">
-                {loading ? <Skeleton className="h-6 w-24" /> : data?.hangar_code}
+                {loading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  data?.hangar_code
+                )}
               </span>
             </Badge>
           </div>
@@ -173,8 +176,7 @@ function DetailsCard({ id }) {
                     <Skeleton className="h-5 w-32 ml-auto" />
                   ) : (
                     <>
-                      {data?.province}{" "}/{" "}
-                      {data?.commune}
+                      {data?.province} / {data?.commune}
                     </>
                   )}
                 </span>
@@ -191,9 +193,7 @@ function DetailsCard({ id }) {
                   {loading ? (
                     <Skeleton className="h-5 w-32 ml-auto" />
                   ) : (
-                    <>
-                      {data?.responsable_name}
-                    </>
+                    <>{data?.responsable_name}</>
                   )}
                 </span>
               </div>
@@ -214,7 +214,10 @@ function DetailsCard({ id }) {
                 </span>
               </div>
               <Separator className="my-2" />
-              <div className="flex justify-center"> <AddPrevision sdl_id={data?.id} /></div>
+              <div className="flex justify-center">
+                {" "}
+                <AddPrevision sdl_id={data?.id} />
+              </div>
             </div>
           </div>
         </>

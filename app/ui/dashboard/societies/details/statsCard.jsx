@@ -13,7 +13,7 @@ import {
   Building2,
   Store,
   Archive,
-  Grape,
+  Squircle,
   CircleDollarSign,
   Users,
 } from "lucide-react";
@@ -132,7 +132,7 @@ export default function StatsCard({ id }) {
               <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-max">
                 <span className="text-primary flex items-center gap-1">●</span>
                 <div className="flex flex-row gap-x-1 items-center">
-                  <Grape className="text-primary size-5" />
+                  <Squircle className="text-primary size-5" />
                   <CardTitle className="text-md font-semibold text-primary">
                     Maïs blanc :
                   </CardTitle>
@@ -166,7 +166,7 @@ export default function StatsCard({ id }) {
                   ●
                 </span>
                 <div className="flex flex-row gap-x-1 items-center">
-                  <Grape className="text-secondary size-5" />
+                  <Squircle className="text-secondary size-5" />
                   <CardTitle className="text-md font-semibold text-secondary">
                     Maïs jaune :
                   </CardTitle>
@@ -277,7 +277,7 @@ export default function StatsCard({ id }) {
         </div>
         <div className="flex flex-row gap-x-2 items-center">
           <div className="">
-            <Grape className="size-6 text-secondary" />
+            <Squircle className="size-6 text-secondary" />
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Café Vert Produit</p>
@@ -294,7 +294,7 @@ export default function StatsCard({ id }) {
       {/* Green Coffee Card */}
       <Card className="hidden p-4 fle/x items-center space-x-4 bg-white dark:bg-sidebar border-none shadow-sm rounded-xl h-max">
         <div className="p-3 bg-secondary/20 rounded-lg">
-          <Grape className="size-6 text-secondary dark:text-secondary-foreground" />
+          <Squircle className="size-6 text-secondary dark:text-secondary-foreground" />
         </div>
         <div>
           <p className="text-sm text-muted-foreground">Café Vert Produit</p>

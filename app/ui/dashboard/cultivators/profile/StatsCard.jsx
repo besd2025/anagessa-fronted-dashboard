@@ -10,7 +10,7 @@ import {
   Archive,
   Banknote,
   CircleDollarSign,
-  Grape,
+  Squircle,
   Landmark,
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
@@ -124,7 +124,7 @@ function StatsCard({ cult_id }) {
                   ●
                 </span>
                 <div className="flex flex-row gap-x-1 items-center">
-                  <Grape className="text-secondary size-5" />
+                  <Squircle className="text-secondary size-5" />
                   <CardTitle className="text-md font-semibold text-secondary">
                     Maïs blanc :
                   </CardTitle>
@@ -162,7 +162,7 @@ function StatsCard({ cult_id }) {
                   ●
                 </span>
                 <div className="flex flex-row gap-x-1 items-center">
-                  <Grape className="text-primary size-5" />
+                  <Squircle className="text-primary size-5" />
                   <CardTitle className="text-md font-semibold text-primary">
                     Maïs jaune :
                   </CardTitle>
@@ -247,10 +247,10 @@ function StatsCard({ cult_id }) {
       <Card className="@container/card">
         <CardHeader>
           <div className="flex flex-row gap-x-2 items-center">
-            <div className="bg-yellow-500 p-2 rounded-md">
+            <div className="bg-secondary p-2 rounded-md">
               <Landmark className="text-white" />
             </div>
-            <CardTitle className="text-lg font-medium tabular-nums">
+            <CardTitle className="text-lg font-normal tabular-nums text-secondary">
               <div className="text-muted-foreground  font-normal text-sm  ">
                 Mode de paiment
               </div>
@@ -261,7 +261,7 @@ function StatsCard({ cult_id }) {
           </div>
           {data?.cultivator_payment_type === "momo" ? (
             <>
-              <CardTitle className="text-xl font-semibold tracking-tight tabular-nums">
+              <CardTitle className="text-xl font-medium tracking-tight tabular-nums">
                 {data?.cultivator_payment_type}
               </CardTitle>
               <div className="flex flex-col gap-y-2">

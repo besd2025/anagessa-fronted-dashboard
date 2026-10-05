@@ -15,7 +15,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  Grape,
+  Squircle,
   Layers,
   Layers2,
   MapPinHouse,
@@ -189,12 +189,12 @@ function ProfileCard({ cult_id }) {
               )}
               {data?.cultivator_entity_type === "personne" ? (
                 <p className="text-sm text-muted-foreground flex flex-row gap-x-2">
-                  <Grape className="text-primary size-5" />
+                  <Squircle className="text-primary size-5" />
                   cultivateur
                 </p>
               ) : (
                 <p className="text-sm text-muted-foreground flex flex-row gap-x-2">
-                  <Grape className="text-primary size-5" />
+                  <Squircle className="text-primary size-5" />
                   association des cultivateurs
                 </p>
               )}

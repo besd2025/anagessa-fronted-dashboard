@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Archive, Grape, CircleDollarSign } from "lucide-react";
+import { Archive, Squircle, CircleDollarSign } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { fetchData } from "@/app/_utils/api";
 export function SectionCards() {
@@ -136,7 +136,7 @@ export function SectionCards() {
               <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-max">
                 <span className="text-primary flex items-center gap-1">●</span>
                 <div className="flex flex-row gap-x-1 items-center">
-                  <Grape className="text-primary size-5" />
+                  <Squircle className="text-primary size-5" />
                   <CardTitle className="text-md font-semibold text-primary">
                     Maïs blanc :
                   </CardTitle>
@@ -172,7 +172,7 @@ export function SectionCards() {
                   ●
                 </span>
                 <div className="flex flex-row gap-x-1 items-center">
-                  <Grape className="text-secondary size-5" />
+                  <Squircle className="text-secondary size-5" />
                   <CardTitle className="text-md font-semibold text-secondary">
                     Maïs jaune :
                   </CardTitle>
@@ -237,7 +237,7 @@ export function SectionCards() {
             <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-max">
               <span className="text-primary flex items-center gap-1">●</span>
               <div className="flex flex-row gap-x-1 items-center">
-                <Grape className="text-primary size-5" />
+                <Squircle className="text-primary size-5" />
                 <CardTitle className="text-md font-semibold text-primary">
                   Maïs blanc :
                 </CardTitle>
@@ -268,7 +268,7 @@ export function SectionCards() {
             <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg">
               <span className="text-secondary flex items-center gap-1">●</span>
               <div className="flex flex-row gap-x-1 items-center">
-                <Grape className="text-secondary size-5" />
+                <Squircle className="text-secondary size-5" />
                 <CardTitle className="text-md font-semibold text-secondary">
                   Maïs jaune :
                 </CardTitle>

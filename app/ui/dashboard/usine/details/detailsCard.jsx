@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { fetchData } from "@/app/_utils/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Grape,
+  Squircle,
   MapPinHouse,
   Phone,
   QrCode,

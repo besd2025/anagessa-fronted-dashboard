@@ -77,11 +77,15 @@ function Filter({ handleFilter }) {
       setCommune([]);
       return;
     }
-    const collines = await fetchData("get", `adress/colline/get_collines_by_zone/`, {
-      params: { zone: value },
-      additionalHeaders: {},
-      body: {},
-    });
+    const collines = await fetchData(
+      "get",
+      `adress/colline/get_collines_by_zone/`,
+      {
+        params: { zone: value },
+        additionalHeaders: {},
+        body: {},
+      },
+    );
     const options = collines?.map((item) => ({
       value: item.colline_name,
       label: item.colline_name,
@@ -196,7 +200,7 @@ function Filter({ handleFilter }) {
           <DialogHeader>
             <DialogTitle>Filtrage</DialogTitle>
           </DialogHeader>
-          <div className="custom-scrollbar h-[60vh] lg:max-h-[500px] overflow-y-auto px-2 pb-3">
+          <div className="custom-scrollbar h-[40vh] lg:max-h-[500px] overflow-y-auto px-2 pb-3">
             <div className="mt-7">
               <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div className="col-span-2 lg:col-span-1">
@@ -273,63 +277,6 @@ function Filter({ handleFilter }) {
                           </option>
                         ))}
                       </select>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-span-2 lg:col-span-1">
-                  <div className="space-y-2">
-                    <Label>Societe</Label>
-                    <div className="relative">
-                      <select
-                        value={selectedSociete}
-                        onChange={(e) => setSelectedSociete(e.target.value)}
-                        className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
-                      >
-                        <option value="">Selectionner societe</option>
-                        {societes.map((c) => (
-                          <option key={c.value} value={c.label}>
-                            {c.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-span-2 lg:col-span-1 z-9999">
-                  <div className="space-y-2">
-                    <div className="mt-6">
-                      <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Depuis
-                      </label>
-                      <div className="relative">
-                        <input
-                          id="event-start-date"
-                          type="date"
-                          value={dateFrom || ""}
-                          onChange={(e) => setDateFrom(e.target.value)}
-                          className="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-span-2 lg:col-span-1 z-9999">
-                  <div className="space-y-2">
-                    <div className="mt-6">
-                      <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Jusqu'à
-                      </label>
-                      <div className="relative">
-                        <input
-                          id="event-start-date"
-                          type="date"
-                          value={dateTo || ""}
-                          onChange={(e) => setDateTo(e.target.value)}
-                          className="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                        />
-                      </div>
                     </div>
                   </div>
                 </div>

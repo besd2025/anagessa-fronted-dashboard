@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Plus, Loader2 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function AddSdl() {
   const [open, setOpen] = useState(false);
@@ -25,40 +26,37 @@ export default function AddSdl() {
   // Form states
   const [code, setCode] = useState("");
   const [sdlName, setSdlName] = useState("");
-  const [soc, setSoc] = useState(""); // code_societe
   const [lastName, setLastName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [telephone, setTelephone] = useState("");
   const [province, setProvince] = useState("");
   const [commune, setCommune] = useState("");
   const [zone, setZone] = useState("");
-  const [colline, setColline] = useState("");
 
   // Options states
   const [provinceOptions, setProvinceOptions] = useState([]);
   const [communeOptions, setCommuneOptions] = useState([]);
   const [zoneOptions, setZoneOptions] = useState([]);
-  const [collineOptions, setCollineOptions] = useState([]);
-  const [societeOptions, setSocieteOptions] = useState([]);
+  const [stockInitial, setStockInitial] = useState("");
+  const [isHangarDes, setHangarDes] = useState(false);
+  const handleCheckBoxChange = (checked) => setHangarDes(checked);
 
   // Load initial data
   useEffect(() => {
     async function loadInitialData() {
       try {
-        const [provData, socData] = await Promise.all([
-          fetchData("get", `adress/province/`, { params: { offset: 0, limit: 100 } }),
-          fetchData("get", `cafe/societes/`, { params: { offset: 0, limit: 150 } })
-        ]);
+        const provData = await fetchData("get", `adress/province/`, {
+          params: { offset: 0, limit: 18 },
+          additionalHeaders: {},
+          body: {},
+        });
 
-        setProvinceOptions(provData?.results?.map(p => ({
-          value: p.province_name,
-          label: p.province_name
-        })) || []);
-
-        setSocieteOptions(socData?.results?.map(s => ({
-          value: s.code_societe,
-          label: s.nom_societe
-        })) || []);
+        setProvinceOptions(
+          provData?.results?.map((p) => ({
+            value: p.province_name,
+            label: p.province_name,
+          })) || [],
+        );
       } catch (err) {
         console.error("Error loading initial data:", err);
       }
@@ -74,21 +72,27 @@ export default function AddSdl() {
     setProvince(value);
     setCommune("");
     setZone("");
-    setColline("");
     setCommuneOptions([]);
     setZoneOptions([]);
-    setCollineOptions([]);
 
     if (!value) return;
 
     try {
-      const data = await fetchData("get", `adress/commune/get_communes_by_province`, {
-        params: { province: value }
-      });
-      setCommuneOptions(data?.map(c => ({
-        value: c.commune_name,
-        label: c.commune_name
-      })) || []);
+      const data = await fetchData(
+        "get",
+        `adress/commune/get_communes_by_province`,
+        {
+          params: { province: value },
+          additionalHeaders: {},
+          body: {},
+        },
+      );
+      setCommuneOptions(
+        data?.map((c) => ({
+          value: c.commune_name,
+          label: c.commune_name,
+        })) || [],
+      );
     } catch (err) {
       console.error("Error fetching communes:", err);
     }
@@ -98,70 +102,52 @@ export default function AddSdl() {
     const value = e.target.value;
     setCommune(value);
     setZone("");
-    setColline("");
     setZoneOptions([]);
-    setCollineOptions([]);
 
     if (!value) return;
 
     try {
       const data = await fetchData("get", `adress/zone/get_zones_by_commune/`, {
-        params: { commune: value }
+        params: { commune: value },
+        additionalHeaders: {},
+        body: {},
       });
-      setZoneOptions(data?.map(z => ({
-        value: z.zone_name,
-        label: z.zone_name
-      })) || []);
+      setZoneOptions(
+        data?.map((z) => ({
+          value: z.id,
+          label: z.zone_name,
+        })) || [],
+      );
     } catch (err) {
       console.error("Error fetching zones:", err);
-    }
-  };
-
-  const handleZoneChange = async (e) => {
-    const value = e.target.value;
-    setZone(value);
-    setColline("");
-    setCollineOptions([]);
-
-    if (!value) return;
-
-    try {
-      const data = await fetchData("get", `adress/colline/get_collines_by_zone/`, {
-        params: { zone: value }
-      });
-      setCollineOptions(data?.map(c => ({
-        value: c.colline_code,
-        label: c.colline_name
-      })) || []);
-    } catch (err) {
-      console.error("Error fetching collines:", err);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check required fields (adjusted to prioritize visible fields)
-    if (!code || !sdlName || !soc || !colline) {
+    if (!code || !sdlName || !stockInitial || !zone) {
       toast.error("Veuillez remplir tous les champs obligatoires");
       return;
     }
 
     setLoading(true);
     const formData = {
-      sdl_code: code,
-      sdl_nom: sdlName,
-      societe_code: soc,
-      sdl_adress_code: colline,
+      hangar_name: sdlName,
+      hangar_adress: zone,
+      hangar_code: code,
+      initial_stock: stockInitial,
+      for_transfert: isHangarDes,
     };
-    console.log("formData", formData);
     const promise = new Promise(async (resolve, reject) => {
       try {
-        const results = await fetchData("post", `/cafe/hangars/`, {
+        const results = await fetchData("post", `/hangars/`, {
+          params: {},
+          additionalHeaders: {},
           body: formData,
         });
 
-        if (results.status === 200 || results.status === 201) {
+        if (results.status === 201) {
           resolve(results);
         } else {
           reject(new Error("Erreur de l'ajout"));
@@ -179,15 +165,15 @@ export default function AddSdl() {
           setProvince("");
           setCommune("");
           setZone("");
-          setColline("");
           setCode("");
           setSdlName("");
-          setSoc("");
+          setStockInitial("");
+          setHangarDes(false);
           setLastName("");
           setFirstName("");
           setTelephone("");
         }, 1000);
-        return `hangar ${sdlName} a été ajouté avec succès`;;
+        return `hangar ${sdlName} a été ajouté avec succès`;
       },
       error: (err) => err.message || "Donnée non ajoutée",
     });
@@ -213,7 +199,7 @@ export default function AddSdl() {
       <DialogContent className="sm:max-w-[700px] bg-sidebar">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Ajouter une Hangar (hangar)</DialogTitle>
+            <DialogTitle>Ajouter une Hangar</DialogTitle>
             <DialogDescription>
               Veuillez renseigner les informations de la nouvelle hangar.
             </DialogDescription>
@@ -249,19 +235,21 @@ export default function AddSdl() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Société</Label>
-                  <select
-                    value={soc}
-                    onChange={(e) => setSoc(e.target.value)}
-                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option value="">Choisir une société</option>
-                    {societeOptions.map((opt, index) => (
-                      <option key={`${opt.value}-${index}`} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+                  <Label>Stock initial</Label>
+                  <Input
+                    type="number"
+                    value={stockInitial}
+                    onChange={(e) => setStockInitial(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2 flex flex-row gap-x-3">
+                  <Label>Hangar de desengorgement?</Label>
+                  <Checkbox
+                    checked={isHangarDes}
+                    onCheckedChange={handleCheckBoxChange}
+                    className="dark:bg-dark-900"
+                  />
                 </div>
               </div>
             </div>
@@ -345,28 +333,12 @@ export default function AddSdl() {
                   <Label>Zone</Label>
                   <select
                     value={zone}
-                    onChange={handleZoneChange}
+                    onChange={(e) => setZone(e.target.value)}
                     disabled={!commune}
                     className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   >
                     <option value="">Choisir une zone</option>
                     {zoneOptions.map((opt, index) => (
-                      <option key={`${opt.value}-${index}`} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Colline</Label>
-                  <select
-                    value={colline}
-                    onChange={(e) => setColline(e.target.value)}
-                    disabled={!zone}
-                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-                  >
-                    <option value="">Choisir une colline</option>
-                    {collineOptions.map((opt, index) => (
                       <option key={`${opt.value}-${index}`} value={opt.value}>
                         {opt.label}
                       </option>
@@ -379,7 +351,9 @@ export default function AddSdl() {
 
           <DialogFooter className="mt-4">
             <DialogClose asChild>
-              <Button variant="outline" type="button">Annuler</Button>
+              <Button variant="outline" type="button">
+                Annuler
+              </Button>
             </DialogClose>
             <Button type="submit" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

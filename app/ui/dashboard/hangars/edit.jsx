@@ -44,18 +44,26 @@ export default function Edit({ id }) {
     async function loadInitialData() {
       try {
         const [provData, socData] = await Promise.all([
-          fetchData("get", `adress/province/`, { params: { offset: 0, limit: 100 } }),
-          fetchData("get", `cafe/societes/`, { params: { offset: 0, limit: 150 } })
+          fetchData("get", `adress/province/`, {
+            params: { offset: 0, limit: 100 },
+          }),
+          fetchData("get", `cafe/societes/`, {
+            params: { offset: 0, limit: 150 },
+          }),
         ]);
-        setProvinceOptions(provData?.results?.map(p => ({
-          value: p.province_name,
-          label: p.province_name
-        })) || []);
+        setProvinceOptions(
+          provData?.results?.map((p) => ({
+            value: p.province_name,
+            label: p.province_name,
+          })) || [],
+        );
 
-        setSocieteOptions(socData?.results?.map(s => ({
-          value: s.id,
-          label: s.nom_societe
-        })) || []);
+        setSocieteOptions(
+          socData?.results?.map((s) => ({
+            value: s.id,
+            label: s.nom_societe,
+          })) || [],
+        );
       } catch (err) {
         console.error("Error loading initial data:", err);
       }
@@ -84,7 +92,8 @@ export default function Edit({ id }) {
           response?.sdl_adress?.zone_code?.commune_code?.province_code
             ?.province_name || "",
         );
-        const fetchedCommune = response?.sdl_adress?.zone_code?.commune_code?.commune_name || "";
+        const fetchedCommune =
+          response?.sdl_adress?.zone_code?.commune_code?.commune_name || "";
         setCommune(fetchedCommune);
         const fetchedZone = response?.sdl_adress?.zone_code?.zone_name || "";
         setZone(fetchedZone);
@@ -98,7 +107,8 @@ export default function Edit({ id }) {
           setZoneOptions([{ value: fetchedZone, label: fetchedZone }]);
         }
         if (fetchedColline) {
-          const collineName = response?.sdl_adress?.colline_name || fetchedColline;
+          const collineName =
+            response?.sdl_adress?.colline_name || fetchedColline;
           setCollineOptions([{ value: fetchedColline, label: collineName }]);
         }
       } catch (error) {
@@ -122,13 +132,19 @@ export default function Edit({ id }) {
     if (!value) return;
 
     try {
-      const data = await fetchData("get", `adress/commune/get_communes_by_province`, {
-        params: { province: value }
-      });
-      setCommuneOptions(data?.map(c => ({
-        value: c.commune_name,
-        label: c.commune_name
-      })) || []);
+      const data = await fetchData(
+        "get",
+        `adress/commune/get_communes_by_province`,
+        {
+          params: { province: value },
+        },
+      );
+      setCommuneOptions(
+        data?.map((c) => ({
+          value: c.commune_name,
+          label: c.commune_name,
+        })) || [],
+      );
     } catch (err) {
       console.error("Error fetching communes:", err);
     }
@@ -146,12 +162,14 @@ export default function Edit({ id }) {
 
     try {
       const data = await fetchData("get", `adress/zone/get_zones_by_commune/`, {
-        params: { commune: value }
+        params: { commune: value },
       });
-      setZoneOptions(data?.map(z => ({
-        value: z.zone_name,
-        label: z.zone_name
-      })) || []);
+      setZoneOptions(
+        data?.map((z) => ({
+          value: z.zone_name,
+          label: z.zone_name,
+        })) || [],
+      );
     } catch (err) {
       console.error("Error fetching zones:", err);
     }
@@ -166,13 +184,19 @@ export default function Edit({ id }) {
     if (!value) return;
 
     try {
-      const data = await fetchData("get", `adress/colline/get_collines_by_zone/`, {
-        params: { zone: value }
-      });
-      setCollineOptions(data?.map(c => ({
-        value: c.id,
-        label: c.colline_name
-      })) || []);
+      const data = await fetchData(
+        "get",
+        `adress/colline/get_collines_by_zone/`,
+        {
+          params: { zone: value },
+        },
+      );
+      setCollineOptions(
+        data?.map((c) => ({
+          value: c.id,
+          label: c.colline_name,
+        })) || [],
+      );
     } catch (err) {
       console.error("Error fetching collines:", err);
     }
@@ -188,15 +212,11 @@ export default function Edit({ id }) {
     };
     const promise = new Promise(async (resolve, reject) => {
       try {
-        const results = await fetchData(
-          "patch",
-          `/cafe/hangars/${id}/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: formData,
-          },
-        );
+        const results = await fetchData("patch", `/cafe/hangars/${id}/`, {
+          params: {},
+          additionalHeaders: {},
+          body: formData,
+        });
         if (results.status == 200) {
           resolve({ code });
         } else {
@@ -268,21 +288,6 @@ export default function Edit({ id }) {
                     value={sdlName}
                     onChange={(e) => setSdlName(e.target.value)}
                   />
-                </div>
-                <div className="col-span-2 lg:col-span-1 space-y-2">
-                  <Label>Société</Label>
-                  <select
-                    value={societtecode}
-                    onChange={(e) => setSocietteCode(e.target.value)}
-                    className="bg-card h-11 w-full rounded-lg border border-gray-300 px-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option value="">Choisir une société</option>
-                    {societeOptions.map((opt, index) => (
-                      <option key={`${opt.value}-${index}`} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
                 </div>
               </div>
             </div>

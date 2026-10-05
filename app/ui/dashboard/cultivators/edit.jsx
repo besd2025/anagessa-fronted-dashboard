@@ -74,24 +74,31 @@ export default function Edit({
         const data = await fetchData("get", `adress/province/`, {
           params: { offset: 0, limit: 100 },
         });
-        const institution_financieres = await fetchData("get", `mais/institution_financiers/`, {
-          params: { offset: 0, limit: 100 },
-        });
-        const institution_financieres_options = institution_financieres?.results?.map((item) => ({
-          value: item.institution_financier_name,
-          label: item.institution_financier_name,
-        })) || [];
-        const options = data?.results?.map((item) => ({
-          value: item.province_name,
-          label: item.province_name,
-        })) || [];
+        const institution_financieres = await fetchData(
+          "get",
+          `mais/institution_financiers/`,
+          {
+            params: { offset: 0, limit: 100 },
+          },
+        );
+        const institution_financieres_options =
+          institution_financieres?.results?.map((item) => ({
+            value: item.institution_financier_name,
+            label: item.institution_financier_name,
+          })) || [];
+        const options =
+          data?.results?.map((item) => ({
+            value: item.province_name,
+            label: item.province_name,
+          })) || [];
         setProvinceOptions(options);
-        setInstitutionFinancieres(institution_financieres_options)
+        setInstitutionFinancieres(institution_financieres_options);
         const response = await fetchData("get", `/cultivators/${cultivator}/`, {
           params: {},
           additionalHeaders: {},
           body: {},
         });
+        console.log(response);
         setCode(response.cultivator_code || "");
         setFirstName(response?.cultivator_first_name || cultivator_assoc_name);
         setLastName(response?.cultivator_last_name || "");
@@ -115,8 +122,8 @@ export default function Edit({
         setCollectorCode(response?.collector?.unique_code || "");
         setColline(response?.cultivator_adress?.colline_code || "");
         setAdressCode(response?.cultivator_adress?.code || "");
-        setOuvertAPai(response?.cultivator_bank_opened)
-        setBankName(response?.cultivator_bank_name)
+        setOuvertAPai(response?.cultivator_bank_opened);
+        setBankName(response?.cultivator_bank_name);
       } catch (error) {
         console.error("Error loading cultivator data:", error);
       }
@@ -143,12 +150,13 @@ export default function Edit({
       const data = await fetchData(
         "get",
         `adress/commune/get_communes_by_province`,
-        { params: { province: value } }
+        { params: { province: value } },
       );
-      const options = data?.map((item) => ({
-        value: item.commune_name,
-        label: item.commune_name,
-      })) || [];
+      const options =
+        data?.map((item) => ({
+          value: item.commune_name,
+          label: item.commune_name,
+        })) || [];
       setCommuneOptions(options);
       setCommune("");
       setZoneOptions([]);
@@ -177,10 +185,11 @@ export default function Edit({
       const data = await fetchData("get", `adress/zone/get_zones_by_commune/`, {
         params: { commune: value },
       });
-      const options = data?.map((item) => ({
-        value: item.zone_name,
-        label: item.zone_name,
-      })) || [];
+      const options =
+        data?.map((item) => ({
+          value: item.zone_name,
+          label: item.zone_name,
+        })) || [];
       setZoneOptions(options);
       setZone("");
       setCollineOptions([]);
@@ -202,13 +211,18 @@ export default function Edit({
     }
 
     try {
-      const data = await fetchData("get", `adress/colline/get_collines_by_zone/`, {
-        params: { zone: value },
-      });
-      const options = data?.map((item) => ({
-        value: item.colline_code,
-        label: item.colline_name,
-      })) || [];
+      const data = await fetchData(
+        "get",
+        `adress/colline/get_collines_by_zone/`,
+        {
+          params: { zone: value },
+        },
+      );
+      const options =
+        data?.map((item) => ({
+          value: item.colline_code,
+          label: item.colline_name,
+        })) || [];
       setCollineOptions(options);
       setColline("");
     } catch (error) {
@@ -238,9 +252,9 @@ export default function Edit({
       cultivator_mobile_payment_account: payment_phone,
       cultivator_account_owner: proprietaire,
       cultivator_adress_code: colline,
-      collector_code: collector_code
+      collector_code: collector_code,
     };
-    console.log("form data ", formData)
+    console.log("form data ", formData);
     setLoading(true);
 
     const promise = new Promise(async (resolve, reject) => {
@@ -252,10 +266,9 @@ export default function Edit({
             params: {},
             additionalHeaders: {},
             body: formData,
-          }
+          },
         );
         if (results.status === 200 || results.id) {
-
           resolve({ code });
         } else {
           reject(new Error("Erreur lors de la modification"));
@@ -291,7 +304,7 @@ export default function Edit({
         setCollectorCode("");
         setColline("");
         setAdressCode("");
-        setOuvertAPai("")
+        setOuvertAPai("");
         setOpen(false);
         setTimeout(() => setOpen(false), 1000);
         return `${data.code} a été modifié avec succès`;

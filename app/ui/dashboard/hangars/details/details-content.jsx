@@ -38,24 +38,6 @@ import Rapports from "./rapports";
 import ComingSoonOverlay from "@/app/ui/components/coming-soon-overlay";
 
 function DetailsContent({ id }) {
-  // const transferData = [
-  //   {
-  //     id: "cultivator_001",
-  //     from_sdl: "Ngome",
-  //     to_depulpeur_name: "NGANE",
-  //     society: "ODECA",
-  //     qte_tranferer: {
-  //       ca: 78452,
-  //       cb: 741,
-  //     },
-  //     photo_fiche: "/images/logo_1.jpg",
-  //     localite: {
-  //       province: "Buja",
-  //       commune: "Ntahangwa",
-  //     },
-  //   },
-  // ];
-
   const [tab, setTab] = useState("cultivators");
 
   const [data, setData] = React.useState([]);
@@ -86,16 +68,12 @@ function DetailsContent({ id }) {
   );
   const getAchatsSDls = async () => {
     try {
-      const response = await fetchData(
-        "get",
-        `hangars/${id}/achats/`,
-        {
-          params: {
-            limit: limitAchat,
-            offset: pointerAchat,
-          },
+      const response = await fetchData("get", `hangars/${id}/achats/`, {
+        params: {
+          limit: limitAchat,
+          offset: pointerAchat,
         },
-      );
+      });
       const results = response?.results?.items || [];
       console.log("results achats", results);
       const formatData = (achats) => ({
@@ -103,15 +81,25 @@ function DetailsContent({ id }) {
         in_payment: achats?.in_payment,
         cultivator: {
           cultivator_id: achats?.cultivator?.id || achats?.cultivateur?.id,
-          cultivator_code: achats?.cultivator?.cultivator_code || achats?.cultivateur?.cultivator_code,
-          first_name: achats?.cultivator?.cultivator_first_name || achats?.cultivateur?.first_name,
-          last_name: achats?.cultivator?.cultivator_last_name || achats?.cultivateur?.last_name,
+          cultivator_code:
+            achats?.cultivator?.cultivator_code ||
+            achats?.cultivateur?.cultivator_code,
+          first_name:
+            achats?.cultivator?.cultivator_first_name ||
+            achats?.cultivateur?.first_name,
+          last_name:
+            achats?.cultivator?.cultivator_last_name ||
+            achats?.cultivateur?.last_name,
           image_url: achats?.cultivator?.photo || achats?.cultivateur?.photo,
           cultivator_type: "individual",
         },
         localite: {
-          province: achats?.cultivator?.cultivateur_adress?.zone_code?.commune_code?.province_code?.province_name,
-          commune: achats?.cultivator?.cultivateur_adress?.zone_code?.commune_code?.commune_name,
+          province:
+            achats?.cultivator?.cultivateur_adress?.zone_code?.commune_code
+              ?.province_code?.province_name,
+          commune:
+            achats?.cultivator?.cultivateur_adress?.zone_code?.commune_code
+              ?.commune_name,
           zone: achats?.cultivator?.cultivateur_adress?.zone_code?.zone_name,
         },
         num_recu: achats?.receipt_number || "N/A",
@@ -133,20 +121,17 @@ function DetailsContent({ id }) {
 
   const getCultivatorsIndividual = async () => {
     try {
-      const response = await fetchData(
-        "get",
-        `hangars/${id}/cultivateurs/`,
-        {
-          params: { limit: limit, offset: pointer },
-        },
-      );
+      const response = await fetchData("get", `hangars/${id}/cultivateurs/`, {
+        params: { limit: limit, offset: pointer },
+      });
       const results = response?.results || [];
       console.log("results", results);
       const cultivatorsData = results?.map((cultivator) => ({
         id: cultivator?.id,
         cultivator: {
           cultivator_code: cultivator?.cultivator_code,
-          first_name: cultivator?.first_name || cultivator?.cultivator_first_name,
+          first_name:
+            cultivator?.first_name || cultivator?.cultivator_first_name,
           last_name: cultivator?.last_name || cultivator?.cultivator_last_name,
           image_url: cultivator?.photo || cultivator?.cultivator_photo,
           telephone: cultivator?.telephone || cultivator?.cultivator_telephone,
@@ -155,8 +140,12 @@ function DetailsContent({ id }) {
         cni: cultivator?.cni || cultivator?.cultivator_cni,
         cni_image_url: cultivator?.cultivator_cni_photo,
         localite: {
-          province: cultivator?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name,
-          commune: cultivator?.cultivator_adress?.zone_code?.commune_code?.commune_name,
+          province:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.province_code?.province_name,
+          commune:
+            cultivator?.cultivator_adress?.zone_code?.commune_code
+              ?.commune_name,
           zone: cultivator?.cultivator_adress?.zone_code?.zone_name,
         },
       }));
@@ -202,7 +191,6 @@ function DetailsContent({ id }) {
               ?.commune_name,
         },
         champs: cultivator?.nombre_champs,
-
       }));
       setAssociationCultivatorsData(cultivatorsData);
 
@@ -214,20 +202,17 @@ function DetailsContent({ id }) {
 
   const getTransfers = async () => {
     try {
-      const response = await fetchData(
-        "get",
-        `hangars/${id}/transfers/`,
-        {
-          params: {},
-        },
-      );
+      const response = await fetchData("get", `hangars/${id}/transfers/`, {
+        params: {},
+      });
       const results = response?.results || [];
       const transferData = results?.map((transfer) => ({
         id: transfer?.id,
         code: transfer?.code_transfert || `TR-${transfer?.id}`,
         date_transfert: transfer?.transfer_date || transfer?.date_transfert,
         from_sdl: transfer?.from_hangar?.hangar_name || "Hangar",
-        qte_total_tranferer: (transfer?.quantity_blanc || 0) + (transfer?.quantity_jaune || 0),
+        qte_total_tranferer:
+          (transfer?.quantity_blanc || 0) + (transfer?.quantity_jaune || 0),
         qte_tranferer: {
           ca: transfer?.quantity_blanc || 0,
           cb: transfer?.quantity_jaune || 0,
@@ -245,13 +230,9 @@ function DetailsContent({ id }) {
   };
   const getReceptionSdl = async () => {
     try {
-      const response = await fetchData(
-        "get",
-        `hangars/${id}/receptions/`,
-        {
-          params: {},
-        },
-      );
+      const response = await fetchData("get", `hangars/${id}/receptions/`, {
+        params: {},
+      });
       const results = response?.results || [];
       const transferData = results?.map((transfer) => ({
         ...transfer,
@@ -259,7 +240,8 @@ function DetailsContent({ id }) {
         code: transfer?.code_transfert || `TR-${transfer?.id}`,
         from_sdl: transfer?.from_hangar?.hangar_name || "Hangar Source",
         date_transfert: transfer?.transfer_date || transfer?.date_transfert,
-        qte_total_tranferer: (transfer?.quantity_blanc || 0) + (transfer?.quantity_jaune || 0),
+        qte_total_tranferer:
+          (transfer?.quantity_blanc || 0) + (transfer?.quantity_jaune || 0),
         qte_tranferer: {
           ca: transfer?.quantity_blanc || 0,
           cb: transfer?.quantity_jaune || 0,
@@ -279,40 +261,66 @@ function DetailsContent({ id }) {
     XLSX.utils.book_append_sheet(wb, ws, sheetName);
     const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     saveAs(
-      new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }),
+      new Blob([buf], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      }),
       filename,
     );
   };
 
   const exportIndividualCultivatorsToExcel = async () => {
     try {
-      const init = await fetchData("get", `cafe/hangars/${id}/get_cultivators/`, { params: { limit: 1 } });
+      const init = await fetchData(
+        "get",
+        `cafe/hangars/${id}/get_cultivators/`,
+        { params: { limit: 1 } },
+      );
       const total = init?.count || 0;
       if (total === 0) return;
-      const res = await fetchData("get", `cafe/hangars/${id}/get_cultivators/`, { params: { limit: total, offset: 0 } });
+      const res = await fetchData(
+        "get",
+        `cafe/hangars/${id}/get_cultivators/`,
+        { params: { limit: total, offset: 0 } },
+      );
       const rows = (res?.results || []).map((c) => ({
         Code: c?.cultivator_code || "",
         Nom: c?.cultivator_last_name || "",
         Prénom: c?.cultivator_first_name || "",
         Téléphone: c?.cultivator_telephone || "",
-        Province: c?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name || "",
-        Commune: c?.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
+        Province:
+          c?.cultivator_adress?.zone_code?.commune_code?.province_code
+            ?.province_name || "",
+        Commune:
+          c?.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
         Zone: c?.cultivator_adress?.zone_code?.zone_name || "",
         Colline: c?.cultivator_adress?.colline_name || "",
         Champs: c?.nombre_champs || 0,
         status: c?.in_payment ? "Payé" : "Non Payé",
-
       }));
-      buildXlsx(rows, "Cultivateurs", `cultivateurs_sdl_${id}_${new Date().toISOString().split("T")[0]}.xlsx`);
-    } catch (e) { console.error("Export cultivateurs erreur:", e); }
+      buildXlsx(
+        rows,
+        "Cultivateurs",
+        `cultivateurs_sdl_${id}_${new Date().toISOString().split("T")[0]}.xlsx`,
+      );
+    } catch (e) {
+      console.error("Export cultivateurs erreur:", e);
+    }
   };
 
   const exportAssociationCultivatorsToExcel = async () => {
     try {
-      const init = await fetchData("get", `cafe/hangars/${id}/get_cultivators_association/`, { params: { limit: 1 } });
+      const init = await fetchData(
+        "get",
+        `cafe/hangars/${id}/get_cultivators_association/`,
+        { params: { limit: 1 } },
+      );
       const total = init?.count || 0;
       if (total === 0) return;
-      const res = await fetchData("get", `cafe/hangars/${id}/get_cultivators_association/`, { params: { limit: total, offset: 0 } });
+      const res = await fetchData(
+        "get",
+        `cafe/hangars/${id}/get_cultivators_association/`,
+        { params: { limit: total, offset: 0 } },
+      );
       const rows = (res?.results || []).map((c) => ({
         Code: c?.cultivator_code || "",
         Association: c?.cultivator_assoc_name || "",
@@ -320,20 +328,33 @@ function DetailsContent({ id }) {
         Téléphone_rep: c?.cultivator_assoc_rep_phone || "",
         Num_fiche: c?.cultivator_assoc_numero_fiche || "",
         NIF: c?.cultivator_assoc_nif || "",
-        Province: c?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name || "",
-        Commune: c?.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
+        Province:
+          c?.cultivator_adress?.zone_code?.commune_code?.province_code
+            ?.province_name || "",
+        Commune:
+          c?.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
         Champs: c?.nombre_champs || 0,
       }));
-      buildXlsx(rows, "Associations", `associations_sdl_${id}_${new Date().toISOString().split("T")[0]}.xlsx`);
-    } catch (e) { console.error("Export associations erreur:", e); }
+      buildXlsx(
+        rows,
+        "Associations",
+        `associations_sdl_${id}_${new Date().toISOString().split("T")[0]}.xlsx`,
+      );
+    } catch (e) {
+      console.error("Export associations erreur:", e);
+    }
   };
 
   const exportIndividualAchatsToExcel = async () => {
     try {
-      const init = await fetchData("get", `cafe/hangars/${id}/get_achats/`, { params: { limit: 1, cafeiculteur_type: "personne" } });
+      const init = await fetchData("get", `cafe/hangars/${id}/get_achats/`, {
+        params: { limit: 1, cafeiculteur_type: "personne" },
+      });
       const total = init?.count || 0;
       if (total === 0) return;
-      const res = await fetchData("get", `cafe/hangars/${id}/get_achats/`, { params: { limit: total, offset: 0, cafeiculteur_type: "personne" } });
+      const res = await fetchData("get", `cafe/hangars/${id}/get_achats/`, {
+        params: { limit: total, offset: 0, cafeiculteur_type: "personne" },
+      });
       const rows = (res?.results || []).map((a) => ({
         Code_cultivateur: a?.cafeiculteur?.cultivator_code || "",
         Nom: a?.cafeiculteur?.cultivator_last_name || "",
@@ -342,19 +363,33 @@ function DetailsContent({ id }) {
         CA: a?.quantite_cerise_a || 0,
         CB: a?.quantite_cerise_b || 0,
         Date: a?.date_achat || "",
-        Province: a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name || "",
-        Commune: a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
+        Province:
+          a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+            ?.province_code?.province_name || "",
+        Commune:
+          a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+            ?.commune_name || "",
       }));
-      buildXlsx(rows, "Achats", `achats_ind_sdl_${id}_${new Date().toISOString().split("T")[0]}.xlsx`);
-    } catch (e) { console.error("Export achats individuel erreur:", e); }
+      buildXlsx(
+        rows,
+        "Achats",
+        `achats_ind_sdl_${id}_${new Date().toISOString().split("T")[0]}.xlsx`,
+      );
+    } catch (e) {
+      console.error("Export achats individuel erreur:", e);
+    }
   };
 
   const exportAssociationAchatsToExcel = async () => {
     try {
-      const init = await fetchData("get", `cafe/hangars/${id}/get_achats/`, { params: { limit: 1, cafeiculteur_type: "association" } });
+      const init = await fetchData("get", `cafe/hangars/${id}/get_achats/`, {
+        params: { limit: 1, cafeiculteur_type: "association" },
+      });
       const total = init?.count || 0;
       if (total === 0) return;
-      const res = await fetchData("get", `cafe/hangars/${id}/get_achats/`, { params: { limit: total, offset: 0, cafeiculteur_type: "association" } });
+      const res = await fetchData("get", `cafe/hangars/${id}/get_achats/`, {
+        params: { limit: total, offset: 0, cafeiculteur_type: "association" },
+      });
       const rows = (res?.results || []).map((a) => ({
         Code_cultivateur: a?.cafeiculteur?.cultivator_code || "",
         Association: a?.cafeiculteur?.cultivator_assoc_name || "",
@@ -363,11 +398,21 @@ function DetailsContent({ id }) {
         CA: a?.quantite_cerise_a || 0,
         CB: a?.quantite_cerise_b || 0,
         Date: a?.date_achat || "",
-        Province: a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.province_code?.province_name || "",
-        Commune: a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code?.commune_name || "",
+        Province:
+          a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+            ?.province_code?.province_name || "",
+        Commune:
+          a?.cafeiculteur?.cultivator_adress?.zone_code?.commune_code
+            ?.commune_name || "",
       }));
-      buildXlsx(rows, "Achats", `achats_assoc_sdl_${id}_${new Date().toISOString().split("T")[0]}.xlsx`);
-    } catch (e) { console.error("Export achats association erreur:", e); }
+      buildXlsx(
+        rows,
+        "Achats",
+        `achats_assoc_sdl_${id}_${new Date().toISOString().split("T")[0]}.xlsx`,
+      );
+    } catch (e) {
+      console.error("Export achats association erreur:", e);
+    }
   };
 
   useEffect(() => {
@@ -388,7 +433,6 @@ function DetailsContent({ id }) {
     if (tab === "receptionSdl") {
       getReceptionSdl();
     }
-
   }, [cultivateur_type, limit, pointer, tab]);
   const totalPages = Math.ceil(totalCount / limit);
   const onPageChange = (pageNumber) => {
@@ -481,15 +525,11 @@ function DetailsContent({ id }) {
   };
   return (
     <Card className="p-2 space-y-4 rounded-xl shadow-sm">
-      <Tabs
-        value={tab}
-        className=" w-full"
-        onValueChange={handleTabChange}
-      >
+      <Tabs value={tab} className=" w-full" onValueChange={handleTabChange}>
         {/* TABS LIST */}
         <TabsList className="overflow-x-auto flex-nowrap gap-2 w-full">
           <TabsTrigger value="cultivators" className="shrink-0">
-            <Users className="w-4 h-4" /> Cafeiculteurs
+            <Users className="w-4 h-4" /> Cultivateurs
           </TabsTrigger>
 
           <TabsTrigger value="achats" className="shrink-0">
@@ -498,15 +538,11 @@ function DetailsContent({ id }) {
 
           {/* Hidden on Mobile */}
           <TabsTrigger value="transferSdl" className="hidden lg:flex shrink-0">
-            <Spline className="w-4 h-4" /> Transfer(hangar → Deparchage)
+            <Spline className="w-4 h-4" /> Transfert
           </TabsTrigger>
 
           <TabsTrigger value="receptionSdl" className="hidden lg:flex shrink-0">
-            <Spline className="w-4 h-4" /> Reception(CT)
-          </TabsTrigger>
-
-          <TabsTrigger value="rh" className="hidden lg:flex shrink-0">
-            <ScrollText className="w-4 h-4" /> Rapports
+            <Spline className="w-4 h-4" /> Reception
           </TabsTrigger>
 
           <TabsTrigger value="maps" className="hidden lg:flex shrink-0">
@@ -526,35 +562,32 @@ function DetailsContent({ id }) {
                 <DropdownMenuLabel>Menu</DropdownMenuLabel>
 
                 <DropdownMenuItem>
-                  <TabsTrigger value="transferSdl" className="shrink-0"><Spline className="w-4 h-4" /> Transfer(hangar → Depulpage)</TabsTrigger>
-
+                  <TabsTrigger value="transferSdl" className="shrink-0">
+                    <Spline className="w-4 h-4" /> Transfert
+                  </TabsTrigger>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem>
-                  <TabsTrigger value="receptionSdl" className="shrink-0"> <Spline className="w-4 h-4" /> Reception(CT)</TabsTrigger>
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem>
-                  <TabsTrigger value="rendement" className="shrink-0"> <ChartNoAxesCombined className="w-4 h-4" /> Rendement</TabsTrigger>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem>
-                  <TabsTrigger value="rh" className="shrink-0"> <ScrollText className="w-4 h-4" /> RH</TabsTrigger>
+                  <TabsTrigger value="receptionSdl" className="shrink-0">
+                    {" "}
+                    <Spline className="w-4 h-4" /> Reception
+                  </TabsTrigger>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem>
-                  <TabsTrigger value="maps" className="shrink-0"> <MapPinHouse className="w-4 h-4" /> Map</TabsTrigger>
+                  <TabsTrigger value="maps" className="shrink-0">
+                    {" "}
+                    <MapPinHouse className="w-4 h-4" /> Map
+                  </TabsTrigger>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </TabsList>
         <TabsContent value="cultivators">
-          <h1 className="text-xl font-semibold m-2">Liste des Cafeiculteurs</h1>
+          <h1 className="text-xl font-semibold m-2">Liste des Cultivateurs</h1>
           <CultivatorsListTable
             individualData={individualCultivatorsData}
             associationData={associationCultivatorsData}
@@ -585,7 +618,6 @@ function DetailsContent({ id }) {
 
         <TabsContent value="maps">
           <div className="relative w-full h-full overflow-hidden">
-
             <SharedGeoLocalisation
               selectedPlace={selectedPlace}
               onSelectPlace={handleSelectPlace}
@@ -674,13 +706,6 @@ function DetailsContent({ id }) {
             <ReceiptSdlCt data={receptionSdl} />
             {/* <ComingSoonOverlay transparent={true} /> */}
           </div>
-        </TabsContent>
-
-        <TabsContent value="rh">
-          <h1 className="text-xl font-semibold m-2">
-            Selectionner les Rapports
-          </h1>
-          <Rapports id={id} />
         </TabsContent>
       </Tabs>
     </Card>

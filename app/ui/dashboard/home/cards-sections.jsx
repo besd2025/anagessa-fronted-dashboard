@@ -10,15 +10,14 @@ import {
 import {
   Archive,
   CircleDollarSign,
-  Grape,
   ShoppingCart,
   TrendingDown,
   Warehouse,
   Coins,
   Squircle,
-  ArchiveRestore,
   Package,
   UsersRound,
+  ArchiveRestore,
 } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { StatsCardSkeleton } from "@/components/ui/skeletons";

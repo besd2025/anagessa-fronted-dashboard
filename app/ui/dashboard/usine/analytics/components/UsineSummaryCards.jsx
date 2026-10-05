@@ -4,7 +4,7 @@ import React from "react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Building2,
-  Grape,
+  Squircle,
   ArrowDownToLine,
   Factory,
   Leaf,
@@ -30,27 +30,27 @@ export function UsineSummaryCards() {
         const responseUsines = await fetchData(
           "get",
           "mais/usine_deparchage/get_total_usine_deparchage/",
-          {}
+          {},
         );
         const qteRecu = await fetchData(
           "get",
           "mais/usine_deparchage/get_quantite_receptionne/",
-          {}
+          {},
         );
         const qteVendu = await fetchData(
           "get",
           "mais/usine_deparchage/get_quanitite_vert_vendu/",
-          {}
+          {},
         );
         const qteProduit = await fetchData(
           "get",
           "mais/usine_deparchage/get_quanitite_vert_produit/",
-          {}
+          {},
         );
         const qteUsinee = await fetchData(
           "get",
           "mais/usine_deparchage/get_quantite_usinee/",
-          {}
+          {},
         );
 
         const totalUsines = responseUsines?.total_usine_deparchage || 0;
@@ -119,7 +119,7 @@ export function UsineSummaryCards() {
     {
       title: "Stock Café Vert",
       value: data.stock_mais_vert,
-      icon: Grape,
+      icon: Squircle,
       color: "bg-emerald-600",
       unit: "Kg",
       desc: "Global",

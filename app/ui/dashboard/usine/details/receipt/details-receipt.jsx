@@ -7,7 +7,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Grape, ReceiptText, Spline } from "lucide-react";
+import { Squircle, ReceiptText, Spline } from "lucide-react";
 
 export default function DetailsReceipt() {
   return (
@@ -28,7 +28,7 @@ export default function DetailsReceipt() {
             </div>
             <div className="#CA border rounded p-2">
               <h1 className="flex gap-x-2 bg-primary w-max items-center py-1 px-2 rounded-lg text-primary-foreground">
-                <Grape size={20} /> Maïs blanc{" "}
+                <Squircle size={20} /> Maïs blanc{" "}
               </h1>
               <div className="mt-2 flex flex-col gap-y-2">
                 <div className="flex items-center justify-between text-sm ">
@@ -39,7 +39,7 @@ export default function DetailsReceipt() {
             </div>
             <div className="#CA border rounded p-2">
               <h1 className="flex gap-x-2 bg-secondary w-max items-center py-1 px-2 rounded-lg text-primary-foreground">
-                <Grape size={20} /> Maïs jaune{" "}
+                <Squircle size={20} /> Maïs jaune{" "}
               </h1>
               <div className="mt-2 flex flex-col gap-y-2">
                 <div className="flex items-center justify-between text-sm ">

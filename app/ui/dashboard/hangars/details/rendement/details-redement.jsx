@@ -25,7 +25,14 @@ import {
 } from "@/components/ui/table";
 
 import { Button } from "@/components/ui/button";
-import { Grape, Layers2, MapPinHouse, MoreHorizontal, ReceiptText, Spline } from "lucide-react";
+import {
+  Squircle,
+  Layers2,
+  MapPinHouse,
+  MoreHorizontal,
+  ReceiptText,
+  Spline,
+} from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { useEffect } from "react";
 import { UserContext } from "@/app/context/User_Context";
@@ -60,7 +67,10 @@ export default function DetailsRendement({ data }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" className=" px-2 py-1.5 w-full  flex justify-start">
+        <Button
+          variant="ghost"
+          className=" px-2 py-1.5 w-full  flex justify-start"
+        >
           Details
         </Button>
       </DialogTrigger>
@@ -82,13 +92,19 @@ export default function DetailsRendement({ data }) {
                   <TableBody>
                     {loading ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        <TableCell
+                          colSpan={6}
+                          className="text-center py-8 text-muted-foreground"
+                        >
                           Chargement...
                         </TableCell>
                       </TableRow>
                     ) : data.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        <TableCell
+                          colSpan={6}
+                          className="text-center py-8 text-muted-foreground"
+                        >
                           Aucun rendement trouvé.
                         </TableCell>
                       </TableRow>
@@ -108,7 +124,8 @@ export default function DetailsRendement({ data }) {
                                   Actions
                                 </DropdownMenuLabel>
                                 {/* <DetailsRendement data={product} /> */}
-                                {(user?.session?.category == "Admin" || user?.session?.category == "Superviseur") && (
+                                {(user?.session?.category == "Admin" ||
+                                  user?.session?.category == "Superviseur") && (
                                   <EditRendementParche data={product} />
                                 )}
                                 {/* <DropdownMenuItem className="text-destructive">

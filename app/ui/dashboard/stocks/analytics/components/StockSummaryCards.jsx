@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Package, DollarSign, Layers, Grape } from "lucide-react";
+import { Package, DollarSign, Layers, Squircle } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 export function StockSummaryCards() {
@@ -18,15 +18,11 @@ export function StockSummaryCards() {
   React.useEffect(() => {
     const getDatas = async () => {
       try {
-        const response = await fetchData(
-          "get",
-          `/stock_resume/`,
-          {
-            params: {},
-            additionalHeaders: {},
-            body: {},
-          }
-        );
+        const response = await fetchData("get", `/stock_resume/`, {
+          params: {},
+          additionalHeaders: {},
+          body: {},
+        });
         console.log("data: ", response);
         // const rendement = await fetchData(
         //   "get",
@@ -94,7 +90,7 @@ export function StockSummaryCards() {
           <div className=" flex flex-col justify-between gap-y-2 h-full">
             <div className="flex flex-row gap-x-2 items-center bg-primary/10 py-1 px-2 rounded-lg w-full h-1/2">
               <div className="flex flex-row gap-x-1 items-center">
-                <Grape className="text-primary size-5" />
+                <Squircle className="text-primary size-5" />
                 <CardTitle className="text-md font-semibold text-primary">
                   Maïs blanc :
                 </CardTitle>
@@ -102,13 +98,10 @@ export function StockSummaryCards() {
               <CardDescription className="font-semibold text-accent-foreground text-lg">
                 {data?.stock?.blanc >= 1000 ? (
                   <>
-                    {(data?.stock?.blanc / 1000).toLocaleString(
-                      "fr-FR",
-                      {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }
-                    )}{" "}
+                    {(data?.stock?.blanc / 1000).toLocaleString("fr-FR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{" "}
                     <span className="text-base">T</span>
                   </>
                 ) : (
@@ -121,7 +114,7 @@ export function StockSummaryCards() {
             </div>
             <div className="flex flex-row gap-x-2 items-center bg-secondary/10 py-1 px-2 rounded-lg w-full h-1/2">
               <div className="flex flex-row gap-x-1 items-center">
-                <Grape className="text-secondary size-5" />
+                <Squircle className="text-secondary size-5" />
                 <CardTitle className="text-md font-semibold text-secondary">
                   Maïs jaune :
                 </CardTitle>
@@ -129,13 +122,10 @@ export function StockSummaryCards() {
               <CardDescription className="font-semibold text-accent-foreground text-lg">
                 {data?.stock?.jaune >= 1000 ? (
                   <>
-                    {(data?.stock?.jaune / 1000).toLocaleString(
-                      "fr-FR",
-                      {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }
-                    )}{" "}
+                    {(data?.stock?.jaune / 1000).toLocaleString("fr-FR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{" "}
                     <span className="text-base">T</span>
                   </>
                 ) : (

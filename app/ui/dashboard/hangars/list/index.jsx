@@ -8,7 +8,16 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDownIcon, FileChartPie, FileSpreadsheet, ListTodo, MoreHorizontal, Phone, Search, Summary } from "lucide-react";
+import {
+  ArrowUpDownIcon,
+  FileChartPie,
+  FileSpreadsheet,
+  ListTodo,
+  MoreHorizontal,
+  Phone,
+  Search,
+  Summary,
+} from "lucide-react";
 import * as React from "react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -61,7 +70,7 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
     pageIndex: 0,
     pageSize: 10,
   });
-  const user = useContext(UserContext)
+  const user = useContext(UserContext);
   const [filterData, setFilterData] = React.useState([]);
   const isActuallyLoading = externalLoading ?? loading;
   const [pointer, setPointer] = useState(0);
@@ -120,10 +129,14 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
           if (filterData.province) params.province = filterData.province;
           if (filterData.commune) params.commune = filterData.commune;
           if (filterData.zone) params.zone = filterData.zone;
-          if (filterData.QtMinAchetee) params.min_quantity_achete = filterData.QtMinAchetee;
-          if (filterData.QtMaxAchete) params.max_quantity_achete = filterData.QtMaxAchete;
-          if (filterData.QtMinVendue) params.min_quantity_vendu = filterData.QtMinVendue;
-          if (filterData.QtMaxVendue) params.max_quantity_vendu = filterData.QtMaxVendue;
+          if (filterData.QtMinAchetee)
+            params.min_quantity_achete = filterData.QtMinAchetee;
+          if (filterData.QtMaxAchete)
+            params.max_quantity_achete = filterData.QtMaxAchete;
+          if (filterData.QtMinVendue)
+            params.min_quantity_vendu = filterData.QtMinVendue;
+          if (filterData.QtMaxVendue)
+            params.max_quantity_vendu = filterData.QtMaxVendue;
         }
         const response = await fetchData("get", "/hangars/", {
           params,
@@ -139,7 +152,10 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
             type: hangar?.type || "",
           },
           responsable: {
-            first_name: hangar?.responsable_name?.split(" ")?.[0] || hangar?.responsable_name || "",
+            first_name:
+              hangar?.responsable_name?.split(" ")?.[0] ||
+              hangar?.responsable_name ||
+              "",
             last_name: hangar?.responsable_name?.split(" ")?.[1] || "",
             telephone: hangar?.responsable_phone || "",
           },
@@ -277,10 +293,14 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
 
   const DownloadSdlValidationToExcel = async () => {
     try {
-      const response = await fetchData("get", "cafe/cafe_payments/download_payment_validation_export/", {
-        params: { task_id: sdlValidationReportId },
-        isBlob: true,
-      });
+      const response = await fetchData(
+        "get",
+        "cafe/cafe_payments/download_payment_validation_export/",
+        {
+          params: { task_id: sdlValidationReportId },
+          isBlob: true,
+        },
+      );
 
       // Créer le blob avec le bon type MIME
       const blob = new Blob([response.data], {
@@ -347,17 +367,25 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
                 Actions
               </DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(hangar.hangar.sdl_code)}
+                onClick={() =>
+                  navigator.clipboard.writeText(hangar.hangar.sdl_code)
+                }
               >
                 Copier code
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <Link href={`/anagessa-dashboard/hangars/details/?id=${hangar?.id}`}>
+              <Link
+                href={`/anagessa-dashboard/hangars/details/?id=${hangar?.id}`}
+              >
                 <DropdownMenuItem>Details</DropdownMenuItem>
               </Link>
-              {user?.session?.category === "Admin" ? (<div>
-                <Edit id={hangar.id} />
-              </div>) : ""}
+              {user?.session?.category === "Admin" ? (
+                <div>
+                  <Edit id={hangar.id} />
+                </div>
+              ) : (
+                ""
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -414,8 +442,6 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
                   {hangars.sdl_code}
                 </span>
               </div>
-
-              <Badge className="size-max ml-2 text-xs">hangar</Badge>
             </div>
           </div>
         );
@@ -429,7 +455,7 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
         const localite = row.original.localite;
         return (
           <div className="text-sm">
-            {localite?.commune}, {localite?.province}
+            {localite?.province}, {localite?.commune}, {localite?.zone}
           </div>
         );
       },
@@ -477,7 +503,6 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
 
   return (
     <div className="w-full bg-sidebar p-4 rounded-lg">
-
       <>
         <div className="flex flex-col md:flex-row items-center justify-between gap-2 py-4 ">
           <div className="relative ">
@@ -495,7 +520,6 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
               <Filter handleFilter={handleFilter} />
             </div>
             <div className="flex items-center gap-3 text-gray-700">
-
               <ExportButton
                 handleExportSDLs={ExportHangarsToExcel}
                 exportType="sdl_data"
@@ -506,7 +530,9 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
             </div>
             <div className="hidden lg:flex items-center gap-3">
               {user?.session?.category === "Admin" && <AddSdl />}
-              {(user?.session?.category === ROLES.ADMIN || user?.session?.category === ROLES.SUPERVISEUR) && !ActiveSdlValidationBtn ? (
+              {(user?.session?.category === ROLES.ADMIN ||
+                user?.session?.category === ROLES.SUPERVISEUR) &&
+              !ActiveSdlValidationBtn ? (
                 <Button
                   variant="outline"
                   className="border-primary"
@@ -548,28 +574,29 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
                   Télécharger
                 </Button>
               ) : null}
-              {user?.session?.category === "Admin" &&
-                <Button
-                  className="text-sm"
-                  variant="outline"
-                >
+              {user?.session?.category === "Admin" && (
+                <Button className="text-sm" variant="outline">
                   <FileChartPie className=" h-4 w-4" />
                   Rapport hangar
                 </Button>
-              }
+              )}
             </div>
             <div className="block lg:hidden">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost"><MoreHorizontal size={16} /></Button>
+                  <Button variant="ghost">
+                    <MoreHorizontal size={16} />
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  {user?.session?.category === "Admin" &&
+                  {user?.session?.category === "Admin" && (
                     <DropdownMenuItem>
                       <AddSdl />
                     </DropdownMenuItem>
-                  }
-                  {(user?.session?.category === ROLES.ADMIN || user?.session?.category === ROLES.SUPERVISEUR) && !ActiveSdlValidationBtn ? (
+                  )}
+                  {(user?.session?.category === ROLES.ADMIN ||
+                    user?.session?.category === ROLES.SUPERVISEUR) &&
+                  !ActiveSdlValidationBtn ? (
                     <DropdownMenuItem>
                       <Button
                         variant="outline"
@@ -589,31 +616,33 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
                           </>
                         )}
                       </Button>
-                    </DropdownMenuItem>) : ActiveSdlValidationBtn ? (
-                      <DropdownMenuItem>
-                        <Button
-                          variant="ghost"
-                          className="text-green-600 hover:text-green-700"
-                          onClick={DownloadSdlValidationToExcel}
+                    </DropdownMenuItem>
+                  ) : ActiveSdlValidationBtn ? (
+                    <DropdownMenuItem>
+                      <Button
+                        variant="ghost"
+                        className="text-green-600 hover:text-green-700"
+                        onClick={DownloadSdlValidationToExcel}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"
-                            />
-                          </svg>
-                          Télécharger
-                        </Button>
-                      </DropdownMenuItem>) : null}
-                  {user?.session?.category === "Admin" &&
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"
+                          />
+                        </svg>
+                        Télécharger
+                      </Button>
+                    </DropdownMenuItem>
+                  ) : null}
+                  {user?.session?.category === "Admin" && (
                     <DropdownMenuItem>
                       <Button
                         className="font-normal text-sm w-full"
@@ -623,7 +652,7 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
                         Rapport hangar
                       </Button>
                     </DropdownMenuItem>
-                  }
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -643,9 +672,9 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
                       </TableHead>
                     );
                   })}
@@ -685,20 +714,6 @@ export default function HangarsListTable({ isLoading: externalLoading }) {
           </Table>
         </div>
         <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
-            {/* {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected. */}
-          </div>
-          {/* <PaginationControls
-              page={table.getState().pagination.pageIndex + 1}
-              pageSize={table.getState().pagination.pageSize}
-              totalItems={table.getFilteredRowModel().rows.length}
-              totalPages={table.getPageCount()}
-              onPageChange={(pageNumber) => table.setPageIndex(pageNumber - 1)}
-              onPageSizeChange={(size) => table.setPageSize(size)}
-              hasNextPage={table.getCanNextPage()}
-              hasPreviousPage={table.getCanPreviousPage()}
-            /> */}
           <PaginationContent
             datapaginationlimit={datapaginationlimit}
             currentPage={datapagination.currentPage}

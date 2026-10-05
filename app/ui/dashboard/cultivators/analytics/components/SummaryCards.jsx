@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Users, User, Grape } from "lucide-react";
+import { Users, User, Squircle } from "lucide-react";
 import { fetchData } from "@/app/_utils/api";
 import { SimpleCardSkeleton } from "@/components/ui/skeletons";
 export function SummaryCards() {
